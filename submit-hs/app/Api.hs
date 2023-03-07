@@ -9,17 +9,20 @@
 
 module Api where
 
+import Control.Monad.IO.Class
 import Data.Aeson
-import Data.Text
+import Data.String
+import Database
 import GHC.Generics
 import Servant
 import Servant.API
 
-type Spec = "test" :> Get '[JSON] TestResponse
+type Spec = "test" :> Get '[JSON] [TestResponse]
 
 data TestResponse = Response
-  { name :: String,
-    age :: Int
+  { id :: Int,
+    foo :: String,
+    bar :: Int
   }
   deriving (Eq, Show, Generic)
 
@@ -28,11 +31,10 @@ instance ToJSON TestResponse
 api :: Proxy Spec
 api = Proxy
 
-testResponse1 :: TestResponse
-testResponse1 = Response "Isaac Newton" 372
-
 server :: Server Spec
-server = return testResponse1
+server = return $ liftIO $ do
+  tests <- getTests
+  Prelude.map (\test -> Response (_id test) (_foo test) (_bar test)) tests
 
 application :: Application
 application = serve api server

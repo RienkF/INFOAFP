@@ -10,16 +10,16 @@
 
 module Database where
 
-import Data.Int (Int)
 import Data.Text (Text)
 import Database.Beam
 import Database.Beam.Sqlite
 import Database.SQLite.Simple
+import GHC.Int
 
 data TestT f = Test
-  { _id :: Columnar f Int,
+  { _id :: Columnar f Int32,
     _foo :: Columnar f Text,
-    _bar :: Columnar f Int
+    _bar :: Columnar f Int32
   }
   deriving (Generic)
 
@@ -34,7 +34,7 @@ deriving instance Show Test
 deriving instance Eq Test
 
 instance Table TestT where
-  data PrimaryKey TestT f = TestId (Columnar f Int) deriving (Generic, Beamable)
+  data PrimaryKey TestT f = TestId (Columnar f GHC.Int.Int32) deriving (Generic, Beamable)
   primaryKey :: TestT column -> PrimaryKey TestT column
   primaryKey = TestId . _id
 
@@ -47,5 +47,6 @@ testDb = defaultDbSettings
 getTest :: IO ()
 getTest = do
   conn <- open "database.db"
-  users <- runSelectReturningList $ select (all_ (tests testDb))
-  mapM_ (liftIO . print) users
+  runBeamSqlite conn $ do
+    users <- runSelectReturningList $ select (all_ (tests testDb))
+    mapM_ (liftIO . print) users
