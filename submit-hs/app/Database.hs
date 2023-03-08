@@ -38,15 +38,14 @@ instance Table TestT where
   primaryKey :: TestT column -> PrimaryKey TestT column
   primaryKey = TestId . _id
 
-newtype TesttDb f = TestDb {tests :: f (TableEntity TestT)}
+newtype TesttDb f = TestDb {test :: f (TableEntity TestT)}
   deriving (Generic, Database be)
 
 testDb :: DatabaseSettings be TesttDb
 testDb = defaultDbSettings
 
-getTest :: IO ()
+getTest :: IO [Test]
 getTest = do
   conn <- open "database.db"
   runBeamSqlite conn $ do
-    users <- runSelectReturningList $ select (all_ (tests testDb))
-    mapM_ (liftIO . print) users
+    runSelectReturningList $ select (all_ (test testDb))

@@ -2,7 +2,6 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeOperators #-}
@@ -12,17 +11,19 @@ module Api where
 import Control.Monad.IO.Class
 import Data.Aeson
 import Data.String
+import Data.Text
 import Database
 import GHC.Generics
+import GHC.Int
 import Servant
 import Servant.API
 
 type Spec = "test" :> Get '[JSON] [TestResponse]
 
 data TestResponse = Response
-  { id :: Int,
-    foo :: String,
-    bar :: Int
+  { id :: Int32,
+    foo :: Text,
+    bar :: Int32
   }
   deriving (Eq, Show, Generic)
 
@@ -32,9 +33,9 @@ api :: Proxy Spec
 api = Proxy
 
 server :: Server Spec
-server = return $ liftIO $ do
-  tests <- getTests
-  Prelude.map (\test -> Response (_id test) (_foo test) (_bar test)) tests
+server = do
+  tests <- liftIO getTest
+  return (Prelude.map (\test -> Response (_id test) (_foo test) (_bar test)) tests)
 
 application :: Application
 application = serve api server
