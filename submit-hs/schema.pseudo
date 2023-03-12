@@ -1,0 +1,24 @@
+User
+= User Id UserType Name
+
+newType UserType = Teacher | TA | Student
+
+Classroom
+= Classroom Id
+
+ClassRoomParticipant
+= ClassRoomParticipant UserId ClassRoomId
+
+Assignment
+= Assignment Id StartDate Deadline Description Weight ClassRoomId
+
+Submission
+= Submissions Id UserId AssignmentId [Attempt]
+
+Attempt
+= Attempt Id File TimeStamp
+
+# UserId is de reviewer
+
+Grading
+= Grading Id SubmissionId Grade UserId TimeStamp Feedback
