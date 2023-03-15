@@ -24,7 +24,9 @@ executable submit-hs
     -- Modules included in this executable, other than Main.
     other-modules:
         Api,
-        Database
+        Database,
+        Database.Model,
+        Database.Db
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
@@ -37,6 +39,7 @@ executable submit-hs
                     warp,
                     beam-core,
                     beam-sqlite,
-                    sqlite-simple
+                    sqlite-simple,
+                    time
     hs-source-dirs:   app
     default-language: Haskell2010
