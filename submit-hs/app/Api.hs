@@ -18,7 +18,7 @@ import GHC.Int
 import Servant
 import Servant.API
 
-type Spec = "test" :> Get '[JSON] [TestResponse]
+type Spec = "test" :> Get '[JSON] [TestResponse] :<|> Raw
 
 data TestResponse = Response
   { id :: Int32,
@@ -33,9 +33,12 @@ api :: Proxy Spec
 api = Proxy
 
 server :: Server Spec
-server = do
-  tests <- liftIO getTest
-  return (Prelude.map (\test -> Response (_id test) (_foo test) (_bar test)) tests)
+server =
+  ( do
+      tests <- liftIO getTest
+      return (Prelude.map (\test -> Response (_id test) (_foo test) (_bar test)) tests)
+  )
+    :<|> serveDirectoryFileServer "static/"
 
 application :: Application
 application = serve api server
