@@ -17,6 +17,7 @@ import GHC.Generics
 import GHC.Int
 import Servant
 import Servant.API
+import Database
 
 type Spec = "test" :> Get '[JSON] [TestResponse] :<|> Raw
 
@@ -35,8 +36,8 @@ api = Proxy
 server :: Server Spec
 server =
   ( do
-      tests <- liftIO getTest
-      return (Prelude.map (\test -> Response (_id test) (_foo test) (_bar test)) tests)
+      tests <- liftIO getSubmit
+      return Response {id=1, foo="", bar=2}
   )
     :<|> serveDirectoryFileServer "static/"
 
