@@ -3,23 +3,16 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE TypeFamilies #-}
 
--- TODO: Remove this when api has been updated, this is all testing stuff but not actually needed
-
 module Database where
 
 import Data.Text (Text)
 import Database.Beam
 import Database.Beam.Sqlite
-
 import Database.Migrations.InitMigration (initialSetupStep)
 
 import GHC.Int
 import Database.Beam.Migrate.Simple
-    ( CheckedDatabaseSettings,
-      bringUpToDateWithHooks,
-      defaultUpToDateHooks,
-      BringUpToDateHooks(runIrreversibleHook), MigrationSteps )
-import Database.Db (SubmitDb)
+import Database.Db
 import Database.SQLite.Simple
 import qualified Database.Beam.Sqlite.Migrate as Sqlite
 import Database.Beam.Migrate
@@ -37,8 +30,16 @@ allowDestructive :: (Monad m, MonadFail m) => BringUpToDateHooks m
 allowDestructive = defaultUpToDateHooks
   { runIrreversibleHook = pure True }
 
+migrateDB :: Connection
+          -> IO (Maybe (CheckedDatabaseSettings Sqlite SubmitDb))
+migrateDB conn = runBeamSqliteDebug putStrLn conn $
+  bringUpToDateWithHooks
+    allowDestructive
+    Sqlite.migrationBackend
+    initialSetupStep
+
 getSubmit :: IO [User]
 getSubmit = do
   conn <- open "database.db"
   runBeamSqlite conn $ do
-    runSelectReturningList $ select (all_ (test submitDb))
+    runSelectReturningList $ select (all_ (_users submitDb))

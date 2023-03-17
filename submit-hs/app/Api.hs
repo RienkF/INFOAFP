@@ -5,6 +5,7 @@
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Api where
 
@@ -18,6 +19,7 @@ import GHC.Int
 import Servant
 import Servant.API
 import Database
+import Prelude hiding (id)
 
 type Spec = "test" :> Get '[JSON] [TestResponse] :<|> Raw
 
@@ -37,7 +39,7 @@ server :: Server Spec
 server =
   ( do
       tests <- liftIO getSubmit
-      return Response {id=1, foo="", bar=2}
+      return [Response { id=1, foo="", bar=2}]
   )
     :<|> serveDirectoryFileServer "static/"
 
