@@ -18,11 +18,6 @@ import qualified Database.Beam.Sqlite.Migrate as Sqlite
 import Database.Beam.Migrate
 import Database.Model (User)
 
-fullMigration :: MigrationSteps Sqlite
-  ()
-  (CheckedDatabaseSettings Sqlite SubmitDb)
-fullMigration = initialSetupStep
-
 submitDb :: DatabaseSettings Sqlite SubmitDb
 submitDb = unCheckDatabase $ evaluateDatabase fullMigration
 
@@ -30,16 +25,18 @@ allowDestructive :: (Monad m, MonadFail m) => BringUpToDateHooks m
 allowDestructive = defaultUpToDateHooks
   { runIrreversibleHook = pure True }
 
+fullMigration :: MigrationSteps Sqlite () (CheckedDatabaseSettings Sqlite SubmitDb)
+fullMigration = initialSetupStep
+
 migrateDB :: Connection
           -> IO (Maybe (CheckedDatabaseSettings Sqlite SubmitDb))
 migrateDB conn = runBeamSqliteDebug putStrLn conn $
   bringUpToDateWithHooks
     allowDestructive
     Sqlite.migrationBackend
-    initialSetupStep
+    fullMigration
 
-getSubmit :: IO [User]
-getSubmit = do
-  conn <- open "database.db"
+getSubmit :: Connection -> IO [User]
+getSubmit conn = do
   runBeamSqlite conn $ do
     runSelectReturningList $ select (all_ (_users submitDb))

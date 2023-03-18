@@ -12,7 +12,7 @@ initialSetup = SubmitDb
   <$> (createTable "user" $ User
         { _userId = field "id"
             int notNull unique
-        , _userType = field "type" myCustomType
+        , _userType = field "type" userTypeProxy
         , _userName = field "name"
             (nationalVarchar (Just 64))
         })
@@ -75,9 +75,7 @@ initialSetup = SubmitDb
             field "feedback" characterLargeObject
         })
 
-initialSetupStep :: MigrationSteps Sqlite
-  ()
-  (CheckedDatabaseSettings Sqlite SubmitDb)
+initialSetupStep :: MigrationSteps Sqlite () (CheckedDatabaseSettings Sqlite SubmitDb)
 initialSetupStep = migrationStep
   "initial_setup"
   (const initialSetup)

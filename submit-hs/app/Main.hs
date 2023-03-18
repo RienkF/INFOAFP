@@ -7,8 +7,7 @@ import Control.Monad.IO.Class
 import Database.SQLite.Simple
 
 main :: IO ()
--- main = run 80 application
 main = do
     conn <- open "database.db"
     migrateDB conn
-    return ()
+    run 3000 application

@@ -37,15 +37,11 @@ instance (BeamBackend Sqlite, FromBackendRow Sqlite Text) => FromBackendRow Sqli
     case val :: Text of
       "teacher" -> pure Teacher
       "ta" -> pure TA
-      "Student" -> pure Student
+      "student" -> pure Student
       _ -> fail "Invalid"
 
-myCustomType :: DataType Sqlite UserType
-myCustomType = DataType sqliteTextType
-
-{- instance HasSqlValueSyntax Sqlite UserType where
-  sqlValueSyntax = UserType <$> fromBackendRow
--- User -}
+userTypeProxy :: DataType Sqlite UserType
+userTypeProxy = DataType sqliteTextType
 
 data UserT f = User
   { _userId :: C f Int32,

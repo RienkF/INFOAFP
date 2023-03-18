@@ -13,13 +13,13 @@ import Control.Monad.IO.Class
 import Data.Aeson
 import Data.String
 import Data.Text
-import Database
 import GHC.Generics
 import GHC.Int
 import Servant
 import Servant.API
 import Database
 import Prelude hiding (id)
+import Database.SQLite.Simple
 
 type Spec = "test" :> Get '[JSON] [TestResponse] :<|> Raw
 
@@ -38,7 +38,7 @@ api = Proxy
 server :: Server Spec
 server =
   ( do
-      tests <- liftIO getSubmit
+      tests <- liftIO $ open "database.db" >>= getSubmit
       return [Response { id=1, foo="", bar=2}]
   )
     :<|> serveDirectoryFileServer "static/"
