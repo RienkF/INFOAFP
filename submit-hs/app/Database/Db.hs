@@ -4,6 +4,8 @@
 module Database.Db where
 
 import Database.Beam
+import Database.Beam.Migrate
+import Database.Beam.Sqlite
 import Database.Model
 import Database.SQLite.Simple
 

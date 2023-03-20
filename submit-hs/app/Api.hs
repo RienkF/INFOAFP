@@ -2,6 +2,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeOperators #-}
@@ -13,9 +14,12 @@ import Data.Aeson
 import Data.String
 import Data.Text
 import Database
+import Database.SQLite.Simple
 import GHC.Generics
 import GHC.Int
 import Servant
+import Servant.API
+import Prelude hiding (id)
 
 type Spec = "test" :> Get '[JSON] [TestResponse] :<|> Raw
 
@@ -34,8 +38,8 @@ api = Proxy
 server :: Server Spec
 server =
   ( do
-      tests <- liftIO getTest
-      return (Prelude.map (\test -> Response (_id test) (_foo test) (_bar test)) tests)
+      tests <- liftIO $ open "database.db" >>= getSubmit
+      return [Response {id = 1, foo = "", bar = 2}]
   )
     :<|> serveDirectoryFileServer "static/"
 
