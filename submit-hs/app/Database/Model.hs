@@ -27,7 +27,7 @@ import Database.Beam.Query.DataTypes
 data UserType = Teacher | TA | Student
   deriving (Show, Read, Eq, Ord, Enum)
 
--- Beam moet weten wat het voor UserType moet invullen als het leeg moet zijn in de database.
+-- Beam needs to know what to fill in for userType if it should be empty in the db.
 instance BeamMigrateSqlBackend be => HasDefaultSqlDataType be UserType where
   defaultSqlDataType _ _ _ = varCharType Nothing Nothing
 
