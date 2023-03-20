@@ -23,14 +23,13 @@ executable submit-hs
 
     -- Modules included in this executable, other than Main.
     other-modules:
-        Api,
         Api.Server,
         Api.Spec,
         Application.Users,
         Database.Users
-        Database,
         Database.Model,
         Database.Db,
+        Database.Migrations.Migrate,
         Database.Migrations.InitMigration
 
     -- LANGUAGE extensions used by modules in this package.

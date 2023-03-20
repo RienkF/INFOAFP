@@ -1,6 +1,5 @@
 module Api.Server where
 
-import Api hiding (api, server)
 import Api.Spec
 import Control.Monad.IO.Class (MonadIO (liftIO))
 import Data.Data

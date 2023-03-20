@@ -5,7 +5,9 @@ module Database.Db where
 
 import Database.Beam
 import Database.Beam.Migrate
+import Database.Beam.Migrate.Simple
 import Database.Beam.Sqlite
+import qualified Database.Beam.Sqlite.Migrate as Sqlite
 import Database.Model
 import Database.SQLite.Simple
 

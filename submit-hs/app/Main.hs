@@ -1,13 +1,12 @@
 module Main where
 
-import Api
-import Network.Wai.Handler.Warp
-import Database (submitDb, getSubmit, migrateDB)
+import Api.Server
 import Control.Monad.IO.Class
+import Database.Migrations.Migrate
 import Database.SQLite.Simple
+import Network.Wai.Handler.Warp
 
 main :: IO ()
 main = do
-    conn <- open "database.db"
-    migrateDB conn
-    run 3000 application
+  migrateDatabase
+  run 3000 application
