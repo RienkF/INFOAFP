@@ -26,7 +26,8 @@ executable submit-hs
         Api,
         Database,
         Database.Model,
-        Database.Db
+        Database.Db,
+        Database.Migrations.InitMigration
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
@@ -39,6 +40,7 @@ executable submit-hs
                     warp,
                     beam-core,
                     beam-sqlite,
+                    beam-migrate,
                     sqlite-simple,
                     time
     hs-source-dirs:   app

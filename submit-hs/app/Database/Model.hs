@@ -5,6 +5,9 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE InstanceSigs #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Database.Model where
 
@@ -12,12 +15,34 @@ import Data.Int
 import Data.Text
 import Data.Time
 import Database.Beam
+    ( Generic, Identity, Beamable, C, Columnar, Table(..) )
 import qualified GHC.Int
+import Database.Beam.Migrate (HasDefaultSqlDataType, BeamMigrateSqlBackend)
+import Database.Beam.Backend
+import Database.Beam.Migrate.Generics
+import Database.Beam.Sqlite
+import Database.Beam.Sqlite.Syntax (SqliteValueSyntax, SqliteDataTypeSyntax, sqliteTextType)
+import Database.Beam.Query.DataTypes
 
 data UserType = Teacher | TA | Student
   deriving (Show, Read, Eq, Ord, Enum)
 
--- User
+-- Beam moet weten wat het voor UserType moet invullen als het leeg moet zijn in de database.
+instance BeamMigrateSqlBackend be => HasDefaultSqlDataType be UserType where
+  defaultSqlDataType _ _ _ = varCharType Nothing Nothing
+
+instance (BeamBackend Sqlite, FromBackendRow Sqlite Text) => FromBackendRow Sqlite UserType where
+  fromBackendRow :: FromBackendRowM Sqlite UserType
+  fromBackendRow = do
+    val <- fromBackendRow
+    case val :: Text of
+      "teacher" -> pure Teacher
+      "ta" -> pure TA
+      "student" -> pure Student
+      _ -> fail "Invalid"
+
+userTypeProxy :: DataType Sqlite UserType
+userTypeProxy = DataType sqliteTextType
 
 data UserT f = User
   { _userId :: C f Int32,

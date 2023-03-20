@@ -5,6 +5,8 @@ module Database.Db where
 
 import Database.Beam
 import Database.Model
+import Database.Beam.Migrate
+import Database.Beam.Sqlite
 
 data SubmitDb f = SubmitDb
   { _users :: f (TableEntity UserT),
@@ -16,6 +18,3 @@ data SubmitDb f = SubmitDb
     _gradings :: f (TableEntity GradingT)
   }
   deriving (Generic, Database be)
-
-submitDb :: DatabaseSettings be SubmitDb
-submitDb = defaultDbSettings
