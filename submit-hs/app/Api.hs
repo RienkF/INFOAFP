@@ -16,7 +16,6 @@ import Database
 import GHC.Generics
 import GHC.Int
 import Servant
-import Servant.API
 
 type Spec = "test" :> Get '[JSON] [TestResponse] :<|> Raw
 

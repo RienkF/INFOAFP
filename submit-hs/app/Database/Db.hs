@@ -5,17 +5,21 @@ module Database.Db where
 
 import Database.Beam
 import Database.Model
+import Database.SQLite.Simple
 
 data SubmitDb f = SubmitDb
-  { _users :: f (TableEntity UserT),
-    _classRooms :: f (TableEntity ClassRoomT),
-    _classRoomParticipants :: f (TableEntity ClassRoomParticipantT),
-    _assignments :: f (TableEntity AssignmentT),
-    _submissions :: f (TableEntity SubmissionT),
-    _attempts :: f (TableEntity AttemptT),
-    _gradings :: f (TableEntity GradingT)
+  { users :: f (TableEntity UserT),
+    classRooms :: f (TableEntity ClassRoomT),
+    classRoomParticipants :: f (TableEntity ClassRoomParticipantT),
+    assignments :: f (TableEntity AssignmentT),
+    submissions :: f (TableEntity SubmissionT),
+    attempts :: f (TableEntity AttemptT),
+    gradings :: f (TableEntity GradingT)
   }
   deriving (Generic, Database be)
 
 submitDb :: DatabaseSettings be SubmitDb
 submitDb = defaultDbSettings
+
+databaseConnection :: IO Connection
+databaseConnection = open "database.db"
