@@ -17,6 +17,7 @@ import Database.SQLite.Simple
 import qualified Database.Beam.Sqlite.Migrate as Sqlite
 import Database.Beam.Migrate
 import Database.Model (User)
+import Control.Arrow
 
 submitDb :: DatabaseSettings Sqlite SubmitDb
 submitDb = unCheckDatabase $ evaluateDatabase fullMigration
@@ -25,6 +26,7 @@ allowDestructive :: (Monad m, MonadFail m) => BringUpToDateHooks m
 allowDestructive = defaultUpToDateHooks
   { runIrreversibleHook = pure True }
 
+-- Chain the full migration here.
 fullMigration :: MigrationSteps Sqlite () (CheckedDatabaseSettings Sqlite SubmitDb)
 fullMigration = initialSetupStep
 
