@@ -25,5 +25,8 @@ data SubmitDb f = SubmitDb
 submitDb :: DatabaseSettings be SubmitDb
 submitDb = defaultDbSettings
 
+migrateSubmitDb :: CheckedDatabaseSettings be SubmitDb
+migrateSubmitDb = defaultMigratableDbSettings
+
 databaseConnection :: IO Connection
 databaseConnection = open "database.db"

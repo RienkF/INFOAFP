@@ -4,25 +4,30 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE InstanceSigs #-}
-{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module Database.Model where
 
 import Data.Int
 import Data.Text
-import Data.Time
 import Database.Beam
-    ( Generic, Identity, Beamable, C, Columnar, Table(..) )
-import qualified GHC.Int
-import Database.Beam.Migrate (HasDefaultSqlDataType, BeamMigrateSqlBackend)
+  ( Beamable,
+    C,
+    Columnar,
+    Generic,
+    Identity,
+    Table (..),
+  )
 import Database.Beam.Backend
+import Database.Beam.Migrate (BeamMigrateSqlBackend, HasDefaultSqlDataType)
 import Database.Beam.Migrate.Generics
-import Database.Beam.Sqlite
-import Database.Beam.Sqlite.Syntax (SqliteValueSyntax, SqliteDataTypeSyntax, sqliteTextType)
 import Database.Beam.Query.DataTypes
+import Database.Beam.Sqlite
+import Database.Beam.Sqlite.Syntax (SqliteDataTypeSyntax, SqliteValueSyntax, sqliteTextType)
+import qualified GHC.Int
 
 data UserType = Teacher | TA | Student
   deriving (Show, Read, Eq, Ord, Enum)
@@ -93,8 +98,8 @@ instance Table ClassRoomParticipantT where
 
 data AssignmentT f = Assignment
   { _assignmentId :: C f Int32,
-    _startDate :: C f LocalTime,
-    _deadLine :: C f LocalTime,
+    _startDate :: C f Text,
+    _deadLine :: C f Text,
     _description :: C f Text,
     _weight :: C f Double,
     _assignmentClassRoom :: PrimaryKey ClassRoomT f
@@ -129,7 +134,7 @@ instance Table SubmissionT where
 data AttemptT f = Attempt
   { _attemptId :: C f Int32,
     _file :: C f Text,
-    _attemptTimeStamp :: C f LocalTime,
+    _attemptTimeStamp :: C f Text,
     _attemptSubmission :: PrimaryKey SubmissionT f
   }
   deriving (Generic, Beamable)
@@ -149,7 +154,7 @@ data GradingT f = Grading
     _grade :: C f Double,
     -- User that did the review
     _gradingUser :: PrimaryKey UserT f,
-    _gradingTimeStamp :: C f LocalTime,
+    _gradingTimeStamp :: C f Text,
     _feedback :: C f Text
   }
   deriving (Generic, Beamable)
