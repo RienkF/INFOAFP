@@ -1,6 +1,5 @@
 module Database.Migrations.Migrate where
 
-import Database.Beam.Migrate
 import Database.Beam.Migrate.Simple
 import Database.Beam.Sqlite
 import qualified Database.Beam.Sqlite.Migrate as Sqlite
@@ -18,20 +17,17 @@ allowDestructive =
 fullMigration :: MigrationSteps Sqlite () (CheckedDatabaseSettings Sqlite SubmitDb)
 fullMigration = initialSetupStep
 
--- migrateDB ::
---   Connection ->
---   IO (Maybe (CheckedDatabaseSettings Sqlite SubmitDb))
+migrateDB ::
+  Connection ->
+  IO (Maybe (CheckedDatabaseSettings Sqlite SubmitDb))
 migrateDB conn =
   runBeamSqliteDebug putStrLn conn $
-    -- bringUpToDateWithHooks
-    --   allowDestructive
-    --   Sqlite.migrationBackend
-    --   fullMigration
-    autoMigrate
+    bringUpToDateWithHooks
+      allowDestructive
       Sqlite.migrationBackend
-      migrateSubmitDb
+      fullMigration
 
--- migrateDatabase :: IO (Maybe (CheckedDatabaseSettings Sqlite SubmitDb))
+migrateDatabase :: IO (Maybe (CheckedDatabaseSettings Sqlite SubmitDb))
 migrateDatabase = do
   conn <- databaseConnection
   migrateDB conn
