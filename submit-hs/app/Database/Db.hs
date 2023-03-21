@@ -13,8 +13,8 @@ import Database.SQLite.Simple
 
 data SubmitDb f = SubmitDb
   { users :: f (TableEntity UserT),
-    classRooms :: f (TableEntity ClassRoomT),
-    classRoomParticipants :: f (TableEntity ClassRoomParticipantT),
+    classrooms :: f (TableEntity ClassroomT),
+    classroomParticipants :: f (TableEntity ClassroomParticipantT),
     assignments :: f (TableEntity AssignmentT),
     submissions :: f (TableEntity SubmissionT),
     attempts :: f (TableEntity AttemptT),

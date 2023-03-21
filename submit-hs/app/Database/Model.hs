@@ -4,10 +4,10 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE InstanceSigs #-}
-{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module Database.Model where
 
@@ -15,14 +15,20 @@ import Data.Int
 import Data.Text
 import Data.Time
 import Database.Beam
-    ( Generic, Identity, Beamable, C, Columnar, Table(..) )
-import qualified GHC.Int
-import Database.Beam.Migrate (HasDefaultSqlDataType, BeamMigrateSqlBackend)
+  ( Beamable,
+    C,
+    Columnar,
+    Generic,
+    Identity,
+    Table (..),
+  )
 import Database.Beam.Backend
+import Database.Beam.Migrate (BeamMigrateSqlBackend, HasDefaultSqlDataType)
 import Database.Beam.Migrate.Generics
-import Database.Beam.Sqlite
-import Database.Beam.Sqlite.Syntax (SqliteValueSyntax, SqliteDataTypeSyntax, sqliteTextType)
 import Database.Beam.Query.DataTypes
+import Database.Beam.Sqlite
+import Database.Beam.Sqlite.Syntax (SqliteDataTypeSyntax, SqliteValueSyntax, sqliteTextType)
+import qualified GHC.Int
 
 data UserType = Teacher | TA | Student
   deriving (Show, Read, Eq, Ord, Enum)
@@ -60,44 +66,44 @@ instance Table UserT where
 
 -- Classroom
 
-data ClassRoomT f = ClassRoom
-  { _classRoomId :: C f Int32,
-    _name :: C f Text
+data ClassroomT f = Classroom
+  { _classroomId :: C f Int32,
+    _classroomName :: C f Text
   }
   deriving (Generic, Beamable)
 
-type ClassRoom = ClassRoomT Identity
+type Classroom = ClassroomT Identity
 
-instance Table ClassRoomT where
-  data PrimaryKey ClassRoomT f = ClassRoomId (Columnar f GHC.Int.Int32) deriving (Generic, Beamable)
-  primaryKey :: ClassRoomT column -> PrimaryKey ClassRoomT column
-  primaryKey = ClassRoomId . _classRoomId
+instance Table ClassroomT where
+  data PrimaryKey ClassroomT f = ClassroomId (Columnar f GHC.Int.Int32) deriving (Generic, Beamable)
+  primaryKey :: ClassroomT column -> PrimaryKey ClassroomT column
+  primaryKey = ClassroomId . _classroomId
 
 -- Classroom Participants
 
-data ClassRoomParticipantT f = ClassRoomParticipant
-  { _participantClassRoom :: PrimaryKey ClassRoomT f,
-    _participantUser :: PrimaryKey UserT f
+data ClassroomParticipantT f = ClassroomParticipant
+  { _classroomParticipantClassroom :: PrimaryKey ClassroomT f,
+    _classroomParticipantUser :: PrimaryKey UserT f
   }
   deriving (Generic, Beamable)
 
-type ClassRoomParticipant = ClassRoomParticipantT Identity
+type ClassroomParticipant = ClassroomParticipantT Identity
 
-instance Table ClassRoomParticipantT where
-  data PrimaryKey ClassRoomParticipantT f = ClassRoomParticipantId (PrimaryKey ClassRoomT f) (PrimaryKey UserT f)
+instance Table ClassroomParticipantT where
+  data PrimaryKey ClassroomParticipantT f = ClassroomParticipantId (PrimaryKey ClassroomT f) (PrimaryKey UserT f)
     deriving (Generic, Beamable)
-  primaryKey :: ClassRoomParticipantT column -> PrimaryKey ClassRoomParticipantT column
-  primaryKey = ClassRoomParticipantId <$> _participantClassRoom <*> _participantUser
+  primaryKey :: ClassroomParticipantT column -> PrimaryKey ClassroomParticipantT column
+  primaryKey = ClassroomParticipantId <$> _classroomParticipantClassroom <*> _classroomParticipantUser
 
 -- Assignment
 
 data AssignmentT f = Assignment
   { _assignmentId :: C f Int32,
-    _startDate :: C f LocalTime,
-    _deadLine :: C f LocalTime,
-    _description :: C f Text,
-    _weight :: C f Double,
-    _assignmentClassRoom :: PrimaryKey ClassRoomT f
+    _assignmentStartDate :: C f LocalTime,
+    _assignmentDeadline :: C f LocalTime,
+    _assignmentDescription :: C f Text,
+    _assignmentWeight :: C f Double,
+    _assignmentClassroom :: PrimaryKey ClassroomT f
   }
   deriving (Generic, Beamable)
 
@@ -128,8 +134,8 @@ instance Table SubmissionT where
 
 data AttemptT f = Attempt
   { _attemptId :: C f Int32,
-    _file :: C f Text,
-    _attemptTimeStamp :: C f LocalTime,
+    _attemptFile :: C f Text,
+    _attemptTimestamp :: C f LocalTime,
     _attemptSubmission :: PrimaryKey SubmissionT f
   }
   deriving (Generic, Beamable)
@@ -146,11 +152,11 @@ instance Table AttemptT where
 data GradingT f = Grading
   { _gradingId :: C f Int32,
     _gradingSubmission :: PrimaryKey SubmissionT f,
-    _grade :: C f Double,
+    _gradingGrade :: C f Double,
     -- User that did the review
     _gradingUser :: PrimaryKey UserT f,
-    _gradingTimeStamp :: C f LocalTime,
-    _feedback :: C f Text
+    _gradingTimestamp :: C f LocalTime,
+    _gradingFeedback :: C f Text
   }
   deriving (Generic, Beamable)
 

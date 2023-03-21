@@ -26,112 +26,112 @@ initialSetup =
                     (nationalVarchar (Just 64))
               }
         )
-    <*> ( createTable "classRooms" $
-            ClassRoom
-              { _classRoomId =
+    <*> ( createTable "classrooms" $
+            Classroom
+              { _classroomId =
                   field
                     "id"
                     int
                     notNull
                     unique,
-                _name =
+                _classroomName =
                   field
                     "name"
                     (nationalVarchar (Just 64))
               }
         )
-    <*> ( createTable "classroom_participants" $
-            ClassRoomParticipant
-              { _participantClassRoom =
-                  ClassRoomId $
-                    field "participant_classroom" int notNull,
-                _participantUser =
+    <*> ( createTable "participants" $
+            ClassroomParticipant
+              { _classroomParticipantClassroom =
+                  ClassroomId $
+                    field "participant_classroom__id" int notNull,
+                _classroomParticipantUser =
                   UserId $
-                    field "participant_user" int notNull
+                    field "participant_user__id" int notNull
               }
         )
     <*> ( createTable "assignments" $
             Assignment
               { _assignmentId =
                   field
-                    "assignment_id"
+                    "id"
                     int
                     notNull
                     unique,
-                _startDate =
+                _assignmentStartDate =
                   field "start_date" timestamp,
-                _deadLine =
+                _assignmentDeadline =
                   field "deadline" timestamp,
-                _description =
+                _assignmentDescription =
                   field
                     "description"
                     characterLargeObject
                     notNull,
-                _weight =
+                _assignmentWeight =
                   field
                     "weight"
                     double
                     notNull,
-                _assignmentClassRoom =
-                  ClassRoomId $
-                    field "assignment_classroom" int notNull
+                _assignmentClassroom =
+                  ClassroomId $
+                    field "classroom__id" int notNull
               }
         )
     <*> ( createTable "submissions" $
             Submission
               { _submissionId =
                   field
-                    "submission_id"
+                    "id"
                     int
                     notNull
                     unique,
                 _submissionUser =
                   UserId $
-                    field "submission_user" int notNull,
+                    field "user__id" int notNull,
                 _submissionAssignment =
                   AssignmentId $
-                    field "submission_assignment" int notNull
+                    field "assignment__id" int notNull
               }
         )
     <*> ( createTable "attempts" $
             Attempt
               { _attemptId =
                   field
-                    "attempt_id"
+                    "id"
                     int
                     notNull
                     unique,
-                _file =
+                _attemptFile =
                   field
                     "file"
                     characterLargeObject
                     notNull,
-                _attemptTimeStamp =
-                  field "attempt_timestamp" timestamp,
+                _attemptTimestamp =
+                  field "timestamp" timestamp,
                 _attemptSubmission =
                   SubmissionId $
-                    field "attempt_submission" int notNull
+                    field "submission__id" int notNull
               }
         )
     <*> ( createTable "gradings" $
             Grading
               { _gradingId =
                   field
-                    "grading_id"
+                    "id"
                     int
                     notNull
                     unique,
                 _gradingSubmission =
                   SubmissionId $
-                    field "grading_submission" int notNull,
-                _grade =
+                    field "submission__id" int notNull,
+                _gradingGrade =
                   field "grade" double notNull,
                 _gradingUser =
                   UserId $
-                    field "grading_user" int notNull,
-                _gradingTimeStamp =
-                  field "grading_timestamp" timestamp,
-                _feedback =
+                    field "user__id" int notNull,
+                _gradingTimestamp =
+                  field "timestamp" timestamp,
+                _gradingFeedback =
                   field "feedback" characterLargeObject
               }
         )
