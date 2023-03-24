@@ -30,4 +30,4 @@ on hand-writing the routing and API calls.
 Our repository can be found [here](https://github.com/RienkF/INFOAFP/)
 
 # Timeline update
-We are slightly behind schedule, TODO GIJS: explain how we will catch up
+We are slightly behind schedule due to some unforseen issues (particulary with 3rd party libaries). Some of the lost time was invested in getting our migration tool working which should result in faster iteration cycles in the future. We might have to scrap the timing of a solution which was proposed to be done in the last week of the project. This would allow us to shift the schedule one week forward putting us right on track. 
