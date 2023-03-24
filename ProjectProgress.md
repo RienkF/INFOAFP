@@ -7,6 +7,12 @@ author:
  - 'Martin Tjon'
 ---
 
+# Data types and techniques
+
+Our current implementation mainly relies on a set of simple data records storing information such as users, classrooms, assignments, submissions, attempts, and gradings. These data types implement the generic class, so that we can use [Beam](https://haskell-beam.github.io/beam/) as an ORM to create and communicate with an SQLite database. This creationg of the SQLite schema is done via [beam-migrate](https://hackage.haskell.org/package/beam-migrate). We then use [Servant](https://docs.servant.dev/en/stable/index.html) to create a web server that exposes (for now) rather simple CRUD operations on these datatypes as a REST Api, and exposes our frontend.
+
+We use [Elm](https://elm-lang.org/) to create a frontend user interface to allow users to more easily communicate with this api.
+
 # Progress
 
 We have decided on our primary techstack, implemented the [database schema and
@@ -21,3 +27,7 @@ Elm (client) and Haskell (server), this is incompatible with the work we have
 done so far in terms of our database. We will abandon this approach and focus
 on hand-writing the routing and API calls.
 
+Our repository can be found [here](https://github.com/RienkF/INFOAFP/)
+
+# Timeline update
+We are slightly behind schedule, TODO GIJS: explain how we will catch up
