@@ -17,9 +17,9 @@ import GHC.Generics
 import GHC.Int
 import Servant
 import Servant.API
-import Database
 import Prelude hiding (id)
 import Database.SQLite.Simple
+import Database.Db (getSubmit)
 
 type Spec = "test" :> Get '[JSON] [TestResponse] :<|> Raw
 
