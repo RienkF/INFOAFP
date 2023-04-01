@@ -7,7 +7,7 @@ import Database.Beam
 import Database.Beam.Migrate
 import Database.Beam.Migrate.Simple
 import Database.Beam.Sqlite
-import qualified Database.Beam.Sqlite.Migrate as Sqlite
+import Database.Beam.Sqlite.Migrate
 import Database.Model
 import Database.SQLite.Simple
 
@@ -22,8 +22,23 @@ data SubmitDb f = SubmitDb
   }
   deriving (Generic, Database be)
 
-submitDb :: DatabaseSettings be SubmitDb
-submitDb = defaultDbSettings
+submitDb :: DatabaseSettings Sqlite SubmitDb
+submitDb = unCheckDatabase checkedSubmitDb
+
+getSubmit :: Connection -> IO [User]
+getSubmit conn = do
+  runBeamSqlite conn $ do
+    runSelectReturningList $ select (all_ (_users submitDb))
+
+checkedSubmitDb :: CheckedDatabaseSettings Sqlite SubmitDb
+checkedSubmitDb = defaultMigratableDbSettings
+
+migrateDb :: IO ()
+migrateDb = do
+  conn <- liftIO $ open "database.db"
+  liftIO $ runBeamSqliteDebug putStrLn conn migrate
+  where
+    migrate = autoMigrate migrationBackend checkedSubmitDb
 
 databaseConnection :: IO Connection
 databaseConnection = open "database.db"
