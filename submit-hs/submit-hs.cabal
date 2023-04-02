@@ -25,6 +25,7 @@ executable submit-hs
     other-modules:
         Api.Server,
         Api.Spec,
+        Api.Types,
         Application.Users,
         Application.Classrooms,
         Application.Assignments,

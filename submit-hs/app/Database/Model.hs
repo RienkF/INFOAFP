@@ -5,7 +5,6 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE InstanceSigs #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE UndecidableInstances #-}
 
@@ -37,15 +36,13 @@ data UserType = Teacher | TA | Student
 instance BeamMigrateSqlBackend be => HasDefaultSqlDataType be UserType where
   defaultSqlDataType _ _ _ = varCharType Nothing Nothing
 
+-- Tell beam how it should store
+instance HasSqlValueSyntax be String => HasSqlValueSyntax be UserType where
+  sqlValueSyntax = autoSqlValueSyntax
+
 instance (BeamBackend Sqlite, FromBackendRow Sqlite Text) => FromBackendRow Sqlite UserType where
   fromBackendRow :: FromBackendRowM Sqlite UserType
-  fromBackendRow = do
-    val <- fromBackendRow
-    case val :: Text of
-      "teacher" -> pure Teacher
-      "ta" -> pure TA
-      "student" -> pure Student
-      _ -> fail "Invalid"
+  fromBackendRow = read . unpack <$> fromBackendRow
 
 userTypeProxy :: DataType Sqlite UserType
 userTypeProxy = DataType sqliteTextType

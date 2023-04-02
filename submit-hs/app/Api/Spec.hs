@@ -5,6 +5,7 @@
 
 module Api.Spec where
 
+import Api.Types
 import Data.Aeson
 import Data.Functor.Identity (Identity)
 import Data.String (IsString (fromString))
@@ -12,7 +13,7 @@ import Database.Model
 import Servant
 
 type Spec =
-  "users" :> Get '[JSON] [User]
+  "users" :> (Get '[JSON] [User] :<|> "add" :> ReqBody '[JSON] AddUserBody :> PostNoContent)
     :<|> "classrooms" :> Get '[JSON] [Classroom]
     :<|> "classroomParticipants" :> Get '[JSON] [ClassroomParticipant]
     :<|> "assignments" :> Get '[JSON] [Assignment]
