@@ -5,6 +5,10 @@ module Database.Db where
 
 import Database.Beam
 import Database.Beam.Migrate
+  ( CheckedDatabaseSettings,
+    defaultMigratableDbSettings,
+    unCheckDatabase,
+  )
 import Database.Beam.Migrate.Simple
 import Database.Beam.Sqlite
 import Database.Beam.Sqlite.Migrate
@@ -28,7 +32,7 @@ submitDb = unCheckDatabase checkedSubmitDb
 getSubmit :: Connection -> IO [User]
 getSubmit conn = do
   runBeamSqlite conn $ do
-    runSelectReturningList $ select (all_ (_users submitDb))
+    runSelectReturningList $ select (all_ (users submitDb))
 
 checkedSubmitDb :: CheckedDatabaseSettings Sqlite SubmitDb
 checkedSubmitDb = defaultMigratableDbSettings

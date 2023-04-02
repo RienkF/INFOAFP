@@ -38,9 +38,7 @@ executable submit-hs
         Database.Attempts,
         Database.Gradings,
         Database.Model,
-        Database.Db,
-        Database.Migrations.Migrate,
-        Database.Migrations.InitMigration
+        Database.Db
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
