@@ -23,10 +23,23 @@ executable submit-hs
 
     -- Modules included in this executable, other than Main.
     other-modules:
-        Api,
+        Api.Server,
+        Api.Spec,
+        Application.Users,
+        Application.Classrooms,
+        Application.Assignments,
+        Application.Submissions,
+        Application.Attempts,
+        Application.Gradings,
+        Database.Users,
+        Database.Classrooms,
+        Database.Assignments,
+        Database.Submissions,
+        Database.Attempts,
+        Database.Gradings,
         Database.Model,
         Database.Db
-        
+
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
     build-depends:  base ^>=4.16.4.0,

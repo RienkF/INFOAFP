@@ -1,12 +1,12 @@
 module Main where
 
-import Api
-import Network.Wai.Handler.Warp
+import Api.Server
 import Control.Monad.IO.Class
-import Database.SQLite.Simple
 import Database.Db
+import Database.SQLite.Simple
+import Network.Wai.Handler.Warp
 
 main :: IO ()
 main = do
-    migrateDb
-    run 3000 application
+  migrateDb
+  run 3000 application
