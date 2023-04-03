@@ -9,6 +9,7 @@ import Application.Submissions
 import Application.Users
 import Control.Monad.IO.Class (MonadIO (liftIO))
 import Data.Data
+import Network.Wai.Middleware.Cors
 import Servant
 
 api :: Proxy Api.Spec.Spec
@@ -28,4 +29,4 @@ server =
     :<|> serveDirectoryFileServer "static/"
 
 application :: Application
-application = serve api server
+application = simpleCors $ serve api server

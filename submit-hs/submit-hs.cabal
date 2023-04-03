@@ -48,6 +48,7 @@ executable submit-hs
                     servant-server,
                     text,
                     wai,
+                    wai-cors,
                     aeson,
                     warp,
                     beam-core,

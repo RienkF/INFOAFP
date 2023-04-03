@@ -1,5 +1,6 @@
 module Pages.Login exposing (..)
 
+import ApiClient.Users as Users exposing (Model(..), Msg(..), Users, getUsers)
 import Browser exposing (Document)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -13,7 +14,12 @@ import String exposing (fromInt)
 
 
 type alias Model =
-    { selectedUserId : Maybe Int }
+    { selectedUserId : Maybe Int, userOptions : Maybe Users }
+
+
+init : ( Model, Cmd Msg )
+init =
+    ( Model Nothing Nothing, Cmd.map UsersMsg getUsers )
 
 
 
@@ -21,7 +27,7 @@ type alias Model =
 
 
 view : Model -> Document Msg
-view { selectedUserId } =
+view { selectedUserId, userOptions } =
     let
         selectedValue =
             case selectedUserId of
@@ -30,16 +36,21 @@ view { selectedUserId } =
 
                 Nothing ->
                     ""
+
+        options =
+            case userOptions of
+                Just userValues ->
+                    List.map (\{ userName, id } -> option [ value (fromInt id) ] [ text userName ]) userValues
+
+                Nothing ->
+                    []
     in
     { title = "Login"
     , body =
         [ select
             [ value selectedValue ]
             -- TODO: Load options here
-            [ option [ value "1" ] [ text "Rienk" ]
-            , option [ value "2" ] [ text "Martin" ]
-            , option [ value "3" ] [ text "Gijs" ]
-            ]
+            options
         , button
             [ onClick SubmitUser ]
             [ text "Ok" ]
@@ -53,9 +64,29 @@ view { selectedUserId } =
 
 type Msg
     = SubmitUser
+    | UsersMsg Users.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update _ model =
-    -- TODO: Handle
-    ( model, none )
+update msg model =
+    case msg of
+        UsersMsg (DataReceived result) ->
+            case result of
+                Ok users ->
+                    ( { model | userOptions = Just users }
+                    , Cmd.none
+                    )
+
+                -- TODO: Handle
+                Err _ ->
+                    ( model, Cmd.none )
+
+        UsersMsg _ ->
+            ( model, none )
+
+        _ ->
+            ( model, none )
+
+
+
+-- TODO: Handle

@@ -1,13 +1,13 @@
 -- Main module, took a lot of inspiration from https://github.com/rtfeldman/elm-spa-example/blob/master/src/Main.elm
 
 
-module Main exposing (main)
+module Main exposing (main, useInit)
 
 import Browser exposing (Document, UrlRequest, application)
 import Browser.Navigation exposing (Key)
 import Html
 import Pages.Classrooms exposing (Model, Msg)
-import Pages.Login exposing (Model, Msg)
+import Pages.Login exposing (Model, Msg(..), init)
 import Platform.Cmd
 import Platform.Sub
 import Url exposing (Url)
@@ -24,7 +24,12 @@ type Model
 
 init : () -> Url.Url -> Key -> ( Model, Cmd Msg )
 init _ _ _ =
-    ( LoginModel { selectedUserId = Nothing }, Platform.Cmd.none )
+    useInit Pages.Login.init LoginModel LoginMsg
+
+
+useInit : ( a, Cmd b ) -> (a -> Model) -> (b -> Msg) -> ( Model, Cmd Msg )
+useInit ( initModel, initCmd ) fModel fCmd =
+    ( fModel initModel, Cmd.map fCmd initCmd )
 
 
 
@@ -75,7 +80,7 @@ update msg model =
 
 
 updateWith : (subModel -> Model) -> (subMsg -> Msg) -> Model -> ( subModel, Cmd subMsg ) -> ( Model, Cmd Msg )
-updateWith toModel toMsg model ( subModel, subCmd ) =
+updateWith toModel toMsg _ ( subModel, subCmd ) =
     ( toModel subModel
     , Cmd.map toMsg subCmd
     )
