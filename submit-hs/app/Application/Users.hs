@@ -10,7 +10,6 @@ getUsers :: IO [User]
 getUsers = Database.Users.getUsers
 
 -- TODO: Add username validation
-addUser :: AddUserBody -> Handler NoContent
+addUser :: AddUserBody -> Handler (Maybe User)
 addUser body = do
   liftIO $ Database.Users.addUser (userName body) (userType body)
-  return NoContent

@@ -1,6 +1,6 @@
 module Pages.Login exposing (..)
 
-import ApiClient.Users as Users exposing (Model(..), Msg(..), Users, getUsers)
+import ApiClient.Users as Users exposing (Msg(..), Users, getUsers)
 import Browser exposing (Document)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -52,12 +52,18 @@ view { selectedUserId, userOptions } =
     in
     { title = "Login"
     , body =
-        [ select
+        [ h1 [] [ text "Submit-hs" ]
+        , h2 [] [ text "Please log in" ]
+        , select
             [ value selectedValue, onInput (\x -> UpdateUser (toInt x)) ]
             options
         , button
             [ onClick SubmitUser, disabled (isNothing selectedUserId) ]
             [ text "Ok" ]
+        , h2 [] [ text "Or click here to register" ]
+        , button
+            [ onClick RegisterClicked ]
+            [ text "Register" ]
         ]
     }
 
@@ -70,6 +76,7 @@ type Msg
     = UpdateUser (Maybe Int)
     | SubmitUser
     | UsersMsg Users.Msg
+    | RegisterClicked
 
 
 update : Msg -> Model -> ( Model, Cmd Msg, RouteEvent )
@@ -100,3 +107,6 @@ update msg model =
 
                 Just userId ->
                     ( model, none, ToClassrooms userId )
+
+        RegisterClicked ->
+            ( model, none, ToRegister )

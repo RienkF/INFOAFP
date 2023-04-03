@@ -1,16 +1,8 @@
 module ApiClient.Users exposing (..)
 
-import Http
-import Json.Decode exposing (Decoder, andThen, fail, field, int, list, map3, string, succeed)
-
-
-
--- MODEL
-
-
-type Model
-    = Loading
-    | Users Users
+import Http exposing (jsonBody)
+import Json.Decode as Decode exposing (Decoder, Value, andThen, fail, field, int, list, map3, maybe, string, succeed)
+import Json.Encode as Encode exposing (object, string)
 
 
 type alias Users =
@@ -27,23 +19,44 @@ type UserType
     | Ta
 
 
+userTypeToString : UserType -> String
+userTypeToString userType =
+    case userType of
+        Teacher ->
+            "teacher"
+
+        Ta ->
+            "ta"
+
+        Student ->
+            "student"
+
+
+stringToUserType : String -> Maybe UserType
+stringToUserType userType =
+    case userType of
+        "teacher" ->
+            Just Teacher
+
+        "ta" ->
+            Just Ta
+
+        "student" ->
+            Just Student
+
+        _ ->
+            Nothing
+
+
 type Msg
     = SendHttpRequest
     | DataReceived (Result Http.Error (List User))
-
-
-
--- UPDATE
-
-
-url : String
-url =
-    "http://localhost:3000/users"
+    | UserCreated (Result Http.Error (Maybe User))
 
 
 userTypeDecorder : Decoder UserType
 userTypeDecorder =
-    string
+    Decode.string
         |> andThen
             (\str ->
                 case str of
@@ -65,13 +78,30 @@ userDecoder : Decoder User
 userDecoder =
     map3 User
         (field "_userId" int)
-        (field "_userName" string)
+        (field "_userName" Decode.string)
         (field "_userType" userTypeDecorder)
 
 
 getUsers : Cmd Msg
 getUsers =
     Http.get
-        { url = url
+        { url = "http://localhost:3000/users"
         , expect = Http.expectJson DataReceived (list userDecoder)
         }
+
+
+createUser : String -> UserType -> Cmd Msg
+createUser userName userType =
+    Http.post
+        { body = jsonBody (encodeUserBody userName userType)
+        , expect = Http.expectJson UserCreated (maybe userDecoder)
+        , url = "http://localhost:3000/users/add"
+        }
+
+
+encodeUserBody : String -> UserType -> Value
+encodeUserBody userName userType =
+    object
+        [ ( "userName", Encode.string userName )
+        , ( "userType", Encode.string (userTypeToString userType) )
+        ]

@@ -5,9 +5,11 @@ module Main exposing (main, useInit)
 
 import Browser exposing (Document, UrlRequest, application)
 import Browser.Navigation exposing (Key)
-import Html
+import Html exposing (div)
+import Html.Attributes exposing (style)
 import Pages.Classrooms exposing (Model, Msg)
 import Pages.Login exposing (Model, Msg(..), init)
+import Pages.Register
 import Platform.Cmd
 import Platform.Sub
 import RouteEvent exposing (RouteEvent(..))
@@ -20,6 +22,7 @@ import Url exposing (Url)
 
 type Model
     = LoginModel Pages.Login.Model
+    | RegisterModel Pages.Register.Model
     | ClassroomsModel Pages.Classrooms.Model
 
 
@@ -41,18 +44,18 @@ view : Model -> Document Msg
 view model =
     case model of
         LoginModel loginModel ->
-            let
-                loginResult =
-                    Pages.Login.view loginModel
-            in
-            { title = loginResult.title, body = List.map (Html.map LoginMsg) loginResult.body }
+            useView (Pages.Login.view loginModel) LoginMsg
+
+        RegisterModel registerModel ->
+            useView (Pages.Register.view registerModel) RegisterMsg
 
         ClassroomsModel classroomsModel ->
-            let
-                classRoomsResult =
-                    Pages.Classrooms.view classroomsModel
-            in
-            { title = classRoomsResult.title, body = List.map (Html.map ClassroomsMsg) classRoomsResult.body }
+            useView (Pages.Classrooms.view classroomsModel) ClassroomsMsg
+
+
+useView : Document a -> (a -> Msg) -> Document Msg
+useView result mapMsg =
+    { title = result.title, body = [ div [ style "padding-left" "10px" ] (List.map (Html.map mapMsg) result.body) ] }
 
 
 
@@ -61,6 +64,7 @@ view model =
 
 type Msg
     = LoginMsg Pages.Login.Msg
+    | RegisterMsg Pages.Register.Msg
     | ClassroomsMsg Pages.Classrooms.Msg
     | NoMsg
 
@@ -71,6 +75,10 @@ update msg model =
         ( LoginMsg loginMsg, LoginModel loginModel ) ->
             Pages.Login.update loginMsg loginModel
                 |> updateWith LoginModel LoginMsg model
+
+        ( RegisterMsg registerMsg, RegisterModel registerModel ) ->
+            Pages.Register.update registerMsg registerModel
+                |> updateWith RegisterModel RegisterMsg model
 
         ( NoMsg, _ ) ->
             ( model, Platform.Cmd.none )
@@ -90,6 +98,12 @@ updateWith toModel toMsg _ ( subModel, subCmd, routeEvent ) =
 
         ToClassrooms userId ->
             useInit (Pages.Classrooms.init userId) ClassroomsModel ClassroomsMsg
+
+        ToLogin ->
+            useInit Pages.Login.init LoginModel LoginMsg
+
+        ToRegister ->
+            useInit Pages.Register.init RegisterModel RegisterMsg
 
 
 onUrlRequest : UrlRequest -> Msg
