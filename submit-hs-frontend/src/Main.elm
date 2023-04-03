@@ -10,6 +10,7 @@ import Pages.Classrooms exposing (Model, Msg)
 import Pages.Login exposing (Model, Msg(..), init)
 import Platform.Cmd
 import Platform.Sub
+import RouteEvent exposing (RouteEvent(..))
 import Url exposing (Url)
 
 
@@ -79,11 +80,16 @@ update msg model =
             ( model, Cmd.none )
 
 
-updateWith : (subModel -> Model) -> (subMsg -> Msg) -> Model -> ( subModel, Cmd subMsg ) -> ( Model, Cmd Msg )
-updateWith toModel toMsg _ ( subModel, subCmd ) =
-    ( toModel subModel
-    , Cmd.map toMsg subCmd
-    )
+updateWith : (subModel -> Model) -> (subMsg -> Msg) -> Model -> ( subModel, Cmd subMsg, RouteEvent ) -> ( Model, Cmd Msg )
+updateWith toModel toMsg _ ( subModel, subCmd, routeEvent ) =
+    case routeEvent of
+        NoEvent ->
+            ( toModel subModel
+            , Cmd.map toMsg subCmd
+            )
+
+        ToClassrooms userId ->
+            useInit (Pages.Classrooms.init userId) ClassroomsModel ClassroomsMsg
 
 
 onUrlRequest : UrlRequest -> Msg

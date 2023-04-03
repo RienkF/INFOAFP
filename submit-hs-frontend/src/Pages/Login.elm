@@ -4,9 +4,12 @@ import ApiClient.Users as Users exposing (Model(..), Msg(..), Users, getUsers)
 import Browser exposing (Document)
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onInput)
+import List exposing (append)
 import Platform.Cmd exposing (none)
-import String exposing (fromInt)
+import RouteEvent exposing (RouteEvent(..))
+import String exposing (fromInt, toInt)
+import Util exposing (isNothing)
 
 
 
@@ -40,7 +43,9 @@ view { selectedUserId, userOptions } =
         options =
             case userOptions of
                 Just userValues ->
-                    List.map (\{ userName, id } -> option [ value (fromInt id) ] [ text userName ]) userValues
+                    append
+                        [ option [ value "" ] [ text "No user selected" ] ]
+                        (List.map (\{ userName, id } -> option [ value (fromInt id) ] [ text userName ]) userValues)
 
                 Nothing ->
                     []
@@ -48,11 +53,10 @@ view { selectedUserId, userOptions } =
     { title = "Login"
     , body =
         [ select
-            [ value selectedValue ]
-            -- TODO: Load options here
+            [ value selectedValue, onInput (\x -> UpdateUser (toInt x)) ]
             options
         , button
-            [ onClick SubmitUser ]
+            [ onClick SubmitUser, disabled (isNothing selectedUserId) ]
             [ text "Ok" ]
         ]
     }
@@ -63,11 +67,12 @@ view { selectedUserId, userOptions } =
 
 
 type Msg
-    = SubmitUser
+    = UpdateUser (Maybe Int)
+    | SubmitUser
     | UsersMsg Users.Msg
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Model -> ( Model, Cmd Msg, RouteEvent )
 update msg model =
     case msg of
         UsersMsg (DataReceived result) ->
@@ -75,18 +80,23 @@ update msg model =
                 Ok users ->
                     ( { model | userOptions = Just users }
                     , Cmd.none
+                    , NoEvent
                     )
 
                 -- TODO: Handle
                 Err _ ->
-                    ( model, Cmd.none )
+                    ( model, Cmd.none, NoEvent )
 
         UsersMsg _ ->
-            ( model, none )
+            ( model, none, NoEvent )
 
-        _ ->
-            ( model, none )
+        UpdateUser user ->
+            ( { model | selectedUserId = user }, none, NoEvent )
 
+        SubmitUser ->
+            case model.selectedUserId of
+                Nothing ->
+                    ( model, none, NoEvent )
 
-
--- TODO: Handle
+                Just userId ->
+                    ( model, none, ToClassrooms userId )
