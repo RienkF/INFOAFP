@@ -36,6 +36,6 @@ application =
   let corsPolicy =
         simpleCorsResourcePolicy
           { corsMethods = [methodGet, methodPost, methodPut, methodDelete, methodOptions],
-            corsRequestHeaders = [hAuthorization, hContentType, hUserAgent, hAccept]
+            corsRequestHeaders = [hAuthorization, hContentType]
           }
    in cors (const $ Just corsPolicy) $ serve api server
