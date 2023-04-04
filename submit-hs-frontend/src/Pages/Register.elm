@@ -38,22 +38,20 @@ view { username, userType } =
     { title = "Register"
     , body =
         [ h1 [] [ text "Register" ]
-        , Html.form []
-            [ h2 [] [ text "Input username" ]
-            , input
-                [ value username, onInput UpdateUserName ]
-                []
-            , h2 [] [ text "Input user type" ]
-            , select
-                [ value (userTypeToString userType), onInput (\x -> UpdateUserType (stringToUserType x)) ]
-                options
-            , br [] []
-            , br [] []
-            , button
-                [ onClick RegisterUser ]
-                -- , disabled (isNothing selectedUserId) ]
-                [ text "Create user" ]
-            ]
+        , h2 [] [ text "Input username" ]
+        , input
+            [ value username, onInput UpdateUserName ]
+            []
+        , h2 [] [ text "Input user type" ]
+        , select
+            [ value (userTypeToString userType), onInput (\x -> UpdateUserType (stringToUserType x)) ]
+            options
+        , br [] []
+        , br [] []
+        , button
+            [ onClick RegisterUser ]
+            -- , disabled (isNothing selectedUserId) ]
+            [ text "Create user" ]
         ]
     }
 

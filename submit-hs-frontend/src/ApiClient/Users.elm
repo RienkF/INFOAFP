@@ -1,8 +1,8 @@
 module ApiClient.Users exposing (..)
 
 import Http exposing (jsonBody)
-import Json.Decode as Decode exposing (Decoder, Value, andThen, fail, field, int, list, map3, maybe, string, succeed)
-import Json.Encode as Encode exposing (object, string)
+import Json.Decode as Decode exposing (Decoder, Value, andThen, fail, field, int, list, map3, maybe, succeed)
+import Json.Encode as Encode exposing (object)
 
 
 type alias Users =
