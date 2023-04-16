@@ -13,8 +13,14 @@ import Database.Model
 import Servant
 
 type Spec =
-  "users" :> (Get '[JSON] [User] :<|> "add" :> ReqBody '[JSON] AddUserBody :> Post '[JSON] (Maybe User))
-    :<|> "classrooms" :> Get '[JSON] [Classroom]
+  "users"
+    :> ( QueryParam "userIds" [Int] :> Get '[JSON] [User]
+           :<|> "add" :> ReqBody '[JSON] AddUserBody :> Post '[JSON] (Maybe User)
+       )
+    :<|> "classrooms"
+      :> ( Get '[JSON] [Classroom]
+             :<|> "add" :> ReqBody '[JSON] AddClassroomBody :> Post '[JSON] (Maybe Classroom)
+         )
     :<|> "classroomParticipants" :> Get '[JSON] [ClassroomParticipant]
     :<|> "assignments" :> Get '[JSON] [Assignment]
     :<|> "submissions" :> Get '[JSON] [Submission]

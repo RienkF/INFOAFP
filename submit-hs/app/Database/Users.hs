@@ -6,11 +6,19 @@ import Database.Beam.Sqlite
 import Database.Db (SubmitDb (users), databaseConnection, submitDb)
 import Database.Model
 
-getUsers :: IO [User]
-getUsers = do
+getUsers :: Maybe [Int] -> IO [User]
+getUsers idFilter = do
   conn <- databaseConnection
   runBeamSqlite conn $ do
-    runSelectReturningList $ select (all_ (users submitDb))
+    runSelectReturningList $
+      select
+        ( filter_
+            ( \user -> case idFilter of
+                Just filter -> _userId user `in_` map fromIntegral filter
+                Nothing -> val_ True
+            )
+            $ all_ (users submitDb)
+        )
 
 addUser :: String -> UserType -> IO (Maybe User)
 addUser userName userType = do

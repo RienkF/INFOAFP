@@ -6,8 +6,8 @@ import Database.Model
 import qualified Database.Users
 import Servant
 
-getUsers :: IO [User]
-getUsers = Database.Users.getUsers
+getUsers :: Maybe [Int] -> Handler [User]
+getUsers idFilter = liftIO $ Database.Users.getUsers idFilter
 
 -- TODO: Add username validation
 addUser :: AddUserBody -> Handler (Maybe User)

@@ -25,3 +25,15 @@ instance FromJSON UserType where
     "student" -> pure Student
     "ta" -> pure TA
     other -> fail $ "Unknown value for MyEnum: " ++ show other
+
+data AddClassroomBody = AddClassroomBody
+  { teacherId :: Int,
+    classroomName :: String
+  }
+  deriving (Generic, FromJSON)
+
+data AddClassroomParticipantBody = AddClassroomParticipantBody
+  { userId :: Int,
+    classroomId :: Int
+  }
+  deriving (Generic, FromJSON)
