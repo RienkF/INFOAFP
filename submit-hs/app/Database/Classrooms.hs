@@ -6,11 +6,18 @@ import Database.Beam.Sqlite
 import Database.Db (SubmitDb (classroomParticipants, classrooms), databaseConnection, submitDb)
 import Database.Model
 
-getClassrooms :: IO [Classroom]
-getClassrooms = do
+getClassrooms :: Maybe [Int] -> IO [Classroom]
+getClassrooms classRoomFilter = do
   conn <- databaseConnection
   runBeamSqlite conn $ do
-    runSelectReturningList $ select (all_ (classrooms submitDb))
+    runSelectReturningList $ select 
+      ( filter_
+        ( \classroom -> case classRoomFilter of
+            Just filter -> _classroomId classroom `in_` map fromIntegral filter
+            Nothing -> val_ True
+        )
+        $ all_ (classrooms submitDb)
+      )
 
 getClassroomParticipants :: IO [ClassroomParticipant]
 getClassroomParticipants = do

@@ -31,8 +31,8 @@ server =
   )
     :<|> (liftIO getClassrooms :<|> addClassroom)
     :<|> liftIO getClassroomParticipants
-    :<|> liftIO getAssignments
-    :<|> liftIO getSubmissions
+    :<|> (liftIO getAssignments :<|> addAssignment)
+    :<|> (liftIO getSubmissions :<|> addSubmission)
     :<|> liftIO getAttempts
     :<|> liftIO getGradings
     :<|> serveDirectoryFileServer "static/"

@@ -1,10 +1,10 @@
 module Application.Users where
 
-import Api.Types (AddUserBody (userName, userType))
 import Control.Monad.IO.Class
 import Database.Model
 import qualified Database.Users
 import Servant
+import Api.Types.UserTypes
 
 getUsers :: Maybe [Int] -> Handler [User]
 getUsers idFilter = liftIO $ Database.Users.getUsers idFilter
