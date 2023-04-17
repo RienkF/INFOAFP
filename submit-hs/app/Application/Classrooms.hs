@@ -1,15 +1,15 @@
 module Application.Classrooms where
 
-import Api.Types
 import Database.Beam
 import qualified Database.Classrooms
 import Database.Model
 import qualified Database.Model as Database
 import qualified Database.Users
 import Servant
+import Api.Types.ClassroomTypes
 
 getClassrooms :: IO [Classroom]
-getClassrooms = Database.Classrooms.getClassrooms
+getClassrooms = Database.Classrooms.getClassrooms Nothing
 
 getClassroomParticipants :: IO [ClassroomParticipant]
 getClassroomParticipants = Database.Classrooms.getClassroomParticipants
