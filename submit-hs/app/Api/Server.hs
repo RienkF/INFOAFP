@@ -27,14 +27,13 @@ api = Proxy
 
 server :: Server Api.Spec.Spec
 server =
-  ( getUsers :<|> addUser
-  )
-    :<|> (liftIO getClassrooms :<|> addClassroom)
-    :<|> liftIO getClassroomParticipants
-    :<|> (liftIO getAssignments :<|> addAssignment)
-    :<|> (liftIO getSubmissions :<|> addSubmission)
-    :<|> liftIO getAttempts
-    :<|> liftIO getGradings
+  ( getUsers :<|> addUser )
+    :<|> (getClassrooms :<|> addClassroom)
+    :<|> getClassroomParticipants
+    :<|> (getAssignments :<|> addAssignment)
+    :<|> (getSubmissions :<|> addSubmission)
+    :<|> (getAttempts :<|> addAttempt)
+    :<|> getGradings
     :<|> serveDirectoryFileServer "static/"
 
 application :: Application

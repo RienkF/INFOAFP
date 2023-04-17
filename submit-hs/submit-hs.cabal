@@ -29,6 +29,7 @@ executable submit-hs
         Api.Types.UserTypes,
         Api.Types.SubmissionTypes,
         Api.Types.AssignmentTypes,
+        Api.Types.AttemptTypes,
         Application.Users,
         Application.Classrooms,
         Application.Assignments,
