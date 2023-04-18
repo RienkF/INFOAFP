@@ -15,7 +15,7 @@ parser =
     oneOf
         [ Parser.map Login (s "login")
         , Parser.map Register (s "register")
-        , Parser.map Classrooms (s "classrooms" </> int)
+        , Parser.map Classrooms (s "users" </> int </> s "classrooms")
         ]
 
 

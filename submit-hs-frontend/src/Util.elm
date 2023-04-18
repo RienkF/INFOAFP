@@ -1,5 +1,7 @@
 module Util exposing (..)
 
+import Html exposing (Html, p, text)
+
 
 isNothing : Maybe a -> Bool
 isNothing val =
@@ -9,3 +11,13 @@ isNothing val =
 
         Just _ ->
             False
+
+
+loadingIfNothing : Maybe a -> (a -> Html msg) -> Html msg
+loadingIfNothing maybeData render =
+    case maybeData of
+        Nothing ->
+            p [] [ text "loading" ]
+
+        Just a ->
+            render a

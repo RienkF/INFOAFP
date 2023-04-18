@@ -1,9 +1,14 @@
 module Pages.Classrooms exposing (..)
 
-import ApiClient.Users as Users exposing (Msg(..), User, getUser)
+import ApiClient.Classrooms exposing (Classrooms, getUserClassrooms)
+import ApiClient.Users exposing (User, getUser)
 import Browser exposing (Document)
 import Browser.Navigation exposing (Key)
-import Html exposing (p, text)
+import Html exposing (a, li, p, text, ul)
+import Html.Attributes exposing (href)
+import List exposing (map)
+import String exposing (fromInt)
+import Util exposing (loadingIfNothing)
 
 
 
@@ -12,11 +17,11 @@ import Html exposing (p, text)
 
 init : Key -> Int -> ( Model, Cmd Msg )
 init navKey userId =
-    ( Model navKey userId Nothing, Cmd.map UsersMsg (getUser userId) )
+    ( Model navKey userId Nothing Nothing, Cmd.batch [ Cmd.map UsersMsg (getUser userId), Cmd.map ClassroomsMsg (getUserClassrooms userId) ] )
 
 
 type alias Model =
-    { navKey : Key, userId : Int, userData : Maybe User }
+    { navKey : Key, userId : Int, userData : Maybe User, classroomData : Maybe Classrooms }
 
 
 
@@ -24,15 +29,20 @@ type alias Model =
 
 
 view : Model -> Document Msg
-view { userData } =
+view { userData, classroomData } =
     { title = "Classrooms"
     , body =
-        case userData of
-            Nothing ->
-                [ p [] [ text "loading" ] ]
-
-            Just user ->
-                [ p [] [ text ("Classrooms of " ++ user.userName ++ ":") ] ]
+        [ loadingIfNothing userData
+            (\user ->
+                p []
+                    [ text ("Classrooms of " ++ user.userName ++ ":")
+                    , loadingIfNothing classroomData
+                        (\classrooms ->
+                            ul [] (map (\{ id, name } -> li [] [ a [ href ("users/" ++ fromInt user.id ++ "/classrooms/" ++ fromInt id) ] [ text name ] ]) classrooms)
+                        )
+                    ]
+            )
+        ]
     }
 
 
@@ -43,7 +53,7 @@ view { userData } =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        UsersMsg (DataReceived result) ->
+        UsersMsg (ApiClient.Users.DataReceived result) ->
             case result of
                 Ok users ->
                     case users of
@@ -62,10 +72,25 @@ update msg model =
         UsersMsg _ ->
             ( model, Cmd.none )
 
+        ClassroomsMsg (ApiClient.Classrooms.DataReceived result) ->
+            case result of
+                Ok classrooms ->
+                    ( { model | classroomData = Just classrooms }
+                    , Cmd.none
+                    )
+
+                -- TODO: Handle
+                Err _ ->
+                    ( model, Cmd.none )
+
+        ClassroomsMsg _ ->
+            ( model, Cmd.none )
+
         NoMsg ->
             ( model, Cmd.none )
 
 
 type Msg
     = NoMsg
-    | UsersMsg Users.Msg
+    | UsersMsg ApiClient.Users.Msg
+    | ClassroomsMsg ApiClient.Classrooms.Msg

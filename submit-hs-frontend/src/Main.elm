@@ -4,7 +4,7 @@
 module Main exposing (main, useInit)
 
 import Browser exposing (Document, application)
-import Browser.Navigation exposing (Key)
+import Browser.Navigation exposing (Key, load)
 import Html exposing (div)
 import Html.Attributes exposing (style)
 import Pages.Classrooms exposing (Model, Msg)
@@ -100,6 +100,16 @@ update msg model =
     case ( msg, model ) of
         ( ChangedUrl url, _ ) ->
             changeRouteTo (Route.fromUrl url) model
+
+        ( ClickedLink urlRequest, _ ) ->
+            case urlRequest of
+                Browser.Internal url ->
+                    changeRouteTo (Route.fromUrl url) model
+
+                Browser.External href ->
+                    ( model
+                    , load href
+                    )
 
         ( LoginMsg loginMsg, LoginModel loginModel ) ->
             Pages.Login.update loginMsg loginModel

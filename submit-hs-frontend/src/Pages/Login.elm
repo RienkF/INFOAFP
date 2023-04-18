@@ -1,6 +1,6 @@
 module Pages.Login exposing (..)
 
-import ApiClient.Users as Users exposing (Msg(..), Users, getUsers)
+import ApiClient.Users exposing (Msg(..), Users, getUsers)
 import Browser exposing (Document)
 import Browser.Navigation exposing (Key, pushUrl)
 import Html exposing (..)
@@ -76,7 +76,7 @@ view { selectedUserId, userOptions } =
 type Msg
     = UpdateUser (Maybe Int)
     | SubmitUser
-    | UsersMsg Users.Msg
+    | UsersMsg ApiClient.Users.Msg
     | RegisterClicked
 
 
@@ -106,7 +106,7 @@ update msg model =
                     ( model, none )
 
                 Just userId ->
-                    ( model, pushUrl model.navKey ("/classrooms/" ++ fromInt userId) )
+                    ( model, pushUrl model.navKey ("/users/" ++ fromInt userId ++ "/classrooms") )
 
         RegisterClicked ->
             ( model, pushUrl model.navKey "/register" )

@@ -1,6 +1,6 @@
 module Pages.Register exposing (..)
 
-import ApiClient.Users as Users exposing (Msg(..), UserType(..), getUsers, stringToUserType, userTypeToString)
+import ApiClient.Users exposing (Msg(..), UserType(..), createUser, getUsers, stringToUserType, userTypeToString)
 import Browser exposing (Document)
 import Browser.Navigation exposing (Key, pushUrl)
 import Html exposing (..)
@@ -65,7 +65,7 @@ type Msg
     = UpdateUserName String
     | UpdateUserType (Maybe UserType)
     | RegisterUser
-    | UsersMsg Users.Msg
+    | UsersMsg ApiClient.Users.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -97,4 +97,4 @@ update msg model =
                     ( model, none )
 
         RegisterUser ->
-            ( model, Cmd.map UsersMsg (Users.createUser model.username model.userType) )
+            ( model, Cmd.map UsersMsg (createUser model.username model.userType) )
