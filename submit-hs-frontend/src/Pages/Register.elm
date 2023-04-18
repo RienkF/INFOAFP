@@ -2,6 +2,7 @@ module Pages.Register exposing (..)
 
 import ApiClient.Users as Users exposing (Msg(..), UserType(..), getUsers, stringToUserType, userTypeToString)
 import Browser exposing (Document)
+import Browser.Navigation exposing (Key, pushUrl)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
@@ -14,12 +15,12 @@ import RouteEvent exposing (RouteEvent(..))
 
 
 type alias Model =
-    { username : String, userType : UserType }
+    { navKey : Key, username : String, userType : UserType }
 
 
-init : ( Model, Cmd Msg )
-init =
-    ( Model "" Student, Cmd.map UsersMsg getUsers )
+init : Key -> ( Model, Cmd Msg )
+init navKey =
+    ( Model navKey "" Student, Cmd.map UsersMsg getUsers )
 
 
 
@@ -67,34 +68,33 @@ type Msg
     | UsersMsg Users.Msg
 
 
-update : Msg -> Model -> ( Model, Cmd Msg, RouteEvent )
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         UsersMsg (UserCreated result) ->
             case result of
                 Ok _ ->
                     ( model
-                    , Cmd.none
-                    , ToLogin
+                    , pushUrl model.navKey "/login"
                     )
 
                 -- TODO: Handle
                 Err _ ->
-                    ( model, Cmd.none, NoEvent )
+                    ( model, Cmd.none )
 
         UsersMsg _ ->
-            ( model, none, NoEvent )
+            ( model, none )
 
         UpdateUserName userName ->
-            ( { model | username = userName }, none, NoEvent )
+            ( { model | username = userName }, none )
 
         UpdateUserType userType ->
             case userType of
                 Just userTypeValue ->
-                    ( { model | userType = userTypeValue }, none, NoEvent )
+                    ( { model | userType = userTypeValue }, none )
 
                 Nothing ->
-                    ( model, none, NoEvent )
+                    ( model, none )
 
         RegisterUser ->
-            ( model, Cmd.map UsersMsg (Users.createUser model.username model.userType), NoEvent )
+            ( model, Cmd.map UsersMsg (Users.createUser model.username model.userType) )

@@ -3,7 +3,7 @@
 
 module Main exposing (main, useInit)
 
-import Browser exposing (Document, UrlRequest, application)
+import Browser exposing (Document, application)
 import Browser.Navigation exposing (Key)
 import Html exposing (div)
 import Html.Attributes exposing (style)
@@ -12,6 +12,7 @@ import Pages.Login exposing (Model, Msg(..), init)
 import Pages.Register
 import Platform.Cmd
 import Platform.Sub
+import Route exposing (Route(..))
 import RouteEvent exposing (RouteEvent(..))
 import Url exposing (Url)
 
@@ -27,8 +28,11 @@ type Model
 
 
 init : () -> Url.Url -> Key -> ( Model, Cmd Msg )
-init _ _ _ =
-    useInit Pages.Login.init LoginModel LoginMsg
+init _ _ key =
+    useInit
+        (Pages.Login.init key)
+        LoginModel
+        LoginMsg
 
 
 useInit : ( a, Cmd b ) -> (a -> Model) -> (b -> Msg) -> ( Model, Cmd Msg )
@@ -63,15 +67,40 @@ useView result mapMsg =
 
 
 type Msg
-    = LoginMsg Pages.Login.Msg
+    = ChangedUrl Url
+    | ClickedLink Browser.UrlRequest
+    | LoginMsg Pages.Login.Msg
     | RegisterMsg Pages.Register.Msg
     | ClassroomsMsg Pages.Classrooms.Msg
     | NoMsg
 
 
+changeRouteTo : Maybe Route -> Model -> ( Model, Cmd Msg )
+changeRouteTo maybeRoute model =
+    case maybeRoute of
+        Nothing ->
+            Pages.Login.init (getKey model)
+                |> updateWith LoginModel LoginMsg model
+
+        Just Route.Login ->
+            Pages.Login.init (getKey model)
+                |> updateWith LoginModel LoginMsg model
+
+        Just Route.Register ->
+            Pages.Register.init (getKey model)
+                |> updateWith RegisterModel RegisterMsg model
+
+        Just (Route.Classrooms userId) ->
+            Pages.Classrooms.init (getKey model) userId
+                |> updateWith ClassroomsModel ClassroomsMsg model
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case ( msg, model ) of
+        ( ChangedUrl url, _ ) ->
+            changeRouteTo (Route.fromUrl url) model
+
         ( LoginMsg loginMsg, LoginModel loginModel ) ->
             Pages.Login.update loginMsg loginModel
                 |> updateWith LoginModel LoginMsg model
@@ -88,32 +117,24 @@ update msg model =
             ( model, Cmd.none )
 
 
-updateWith : (subModel -> Model) -> (subMsg -> Msg) -> Model -> ( subModel, Cmd subMsg, RouteEvent ) -> ( Model, Cmd Msg )
-updateWith toModel toMsg _ ( subModel, subCmd, routeEvent ) =
-    case routeEvent of
-        NoEvent ->
-            ( toModel subModel
-            , Cmd.map toMsg subCmd
-            )
+getKey : Model -> Key
+getKey model =
+    case model of
+        LoginModel loginModel ->
+            loginModel.navKey
 
-        ToClassrooms userId ->
-            useInit (Pages.Classrooms.init userId) ClassroomsModel ClassroomsMsg
+        RegisterModel registerModel ->
+            registerModel.navKey
 
-        ToLogin ->
-            useInit Pages.Login.init LoginModel LoginMsg
-
-        ToRegister ->
-            useInit Pages.Register.init RegisterModel RegisterMsg
+        ClassroomsModel classroomsModel ->
+            classroomsModel.navKey
 
 
-onUrlRequest : UrlRequest -> Msg
-onUrlRequest _ =
-    NoMsg
-
-
-onUrlChange : Url -> Msg
-onUrlChange _ =
-    NoMsg
+updateWith : (subModel -> Model) -> (subMsg -> Msg) -> Model -> ( subModel, Cmd subMsg ) -> ( Model, Cmd Msg )
+updateWith toModel toMsg _ ( subModel, subCmd ) =
+    ( toModel subModel
+    , Cmd.map toMsg subCmd
+    )
 
 
 
@@ -136,6 +157,6 @@ main =
         , view = view
         , update = update
         , subscriptions = subscriptions
-        , onUrlChange = onUrlChange
-        , onUrlRequest = onUrlRequest
+        , onUrlChange = ChangedUrl
+        , onUrlRequest = ClickedLink
         }
