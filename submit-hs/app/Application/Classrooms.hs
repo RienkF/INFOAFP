@@ -29,3 +29,20 @@ addClassroom body = do
           return classroom
         Nothing -> return Nothing
     _ -> return Nothing
+
+addClassroomParticipant :: AddClassroomParticipantBody -> Handler (Maybe ClassroomParticipant)
+addClassroomParticipant body = do
+  classrooms <- liftIO $ Database.Classrooms.getClassrooms $ Just [classroomId body]
+  case classrooms of
+    [classroom] -> do
+      users <- liftIO $ Database.Users.getUsers $ Just [userId body]
+      case users of
+        [user] -> 
+          liftIO $ 
+            Database.Classrooms.addClassroomParticipant
+            user
+            classroom
+        -- There should be exactly one user for a given Id
+        _ -> return Nothing
+    -- There should be exactly one classroom for a given Id
+    _ -> return Nothing
