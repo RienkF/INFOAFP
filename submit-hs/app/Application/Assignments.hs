@@ -11,8 +11,8 @@ import qualified Database.Model as Database
 import qualified Database.Users
 import Servant
 
-getAssignments :: Handler [Assignment]
-getAssignments = liftIO $ Database.Assignments.getAssignments Nothing
+getAssignments :: IO [Assignment]
+getAssignments = Database.Assignments.getAssignments Nothing
 
 addAssignment :: AddAssignmentBody -> Handler (Maybe Assignment)
 addAssignment body = do

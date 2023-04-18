@@ -2,6 +2,7 @@ module Pages.Login exposing (..)
 
 import ApiClient.Users as Users exposing (Msg(..), Users, getUsers)
 import Browser exposing (Document)
+import Browser.Navigation exposing (Key, pushUrl)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
@@ -17,12 +18,12 @@ import Util exposing (isNothing)
 
 
 type alias Model =
-    { selectedUserId : Maybe Int, userOptions : Maybe Users }
+    { navKey : Key, selectedUserId : Maybe Int, userOptions : Maybe Users }
 
 
-init : ( Model, Cmd Msg )
-init =
-    ( Model Nothing Nothing, Cmd.map UsersMsg getUsers )
+init : Key -> ( Model, Cmd Msg )
+init navKey =
+    ( Model navKey Nothing Nothing, Cmd.map UsersMsg getUsers )
 
 
 
@@ -79,7 +80,7 @@ type Msg
     | RegisterClicked
 
 
-update : Msg -> Model -> ( Model, Cmd Msg, RouteEvent )
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         UsersMsg (DataReceived result) ->
@@ -87,26 +88,25 @@ update msg model =
                 Ok users ->
                     ( { model | userOptions = Just users }
                     , Cmd.none
-                    , NoEvent
                     )
 
                 -- TODO: Handle
                 Err _ ->
-                    ( model, Cmd.none, NoEvent )
+                    ( model, Cmd.none )
 
         UsersMsg _ ->
-            ( model, none, NoEvent )
+            ( model, none )
 
         UpdateUser user ->
-            ( { model | selectedUserId = user }, none, NoEvent )
+            ( { model | selectedUserId = user }, none )
 
         SubmitUser ->
             case model.selectedUserId of
                 Nothing ->
-                    ( model, none, NoEvent )
+                    ( model, none )
 
                 Just userId ->
-                    ( model, none, ToClassrooms userId )
+                    ( model, pushUrl model.navKey ("/classrooms/" ++ fromInt userId) )
 
         RegisterClicked ->
-            ( model, none, ToRegister )
+            ( model, pushUrl model.navKey "/register" )

@@ -1,6 +1,7 @@
 module Pages.Classrooms exposing (..)
 
 import Browser exposing (Document)
+import Browser.Navigation exposing (Key)
 import Html exposing (p, text)
 import String exposing (fromInt)
 
@@ -9,13 +10,13 @@ import String exposing (fromInt)
 -- MODEL
 
 
-init : Int -> ( Model, Cmd Msg )
-init userId =
-    ( Model userId, Cmd.none )
+init : Key -> Int -> ( Model, Cmd Msg )
+init navKey userId =
+    ( Model navKey userId, Cmd.none )
 
 
 type alias Model =
-    { userId : Int }
+    { navKey : Key, userId : Int }
 
 
 

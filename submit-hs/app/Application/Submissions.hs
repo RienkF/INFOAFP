@@ -12,8 +12,8 @@ import Api.Types.ClassroomTypes (AddClassroomParticipantBody(classroomId))
 import Control.Monad.IO.Class
 import qualified Database.Assignments
 
-getSubmissions :: Maybe [Int] -> Handler [Submission]
-getSubmissions idFilter = liftIO $ Database.Submissions.getSubmissions idFilter
+getSubmissions :: IO [Submission]
+getSubmissions = Database.Submissions.getSubmissions Nothing
 
 addSubmission :: AddSubmissionBody -> Handler (Maybe Submission)
 addSubmission body = do

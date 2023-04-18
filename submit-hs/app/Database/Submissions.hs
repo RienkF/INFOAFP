@@ -9,16 +9,7 @@ getSubmissions :: Maybe [Int] -> IO [Submission]
 getSubmissions idFilter = do
   conn <- databaseConnection
   runBeamSqlite conn $ do
-    runSelectReturningList $ 
-      select 
-        ( filter_
-          ( \submission -> case idFilter of 
-              Just filter -> _submissionId submission `in_` Prelude.map fromIntegral filter
-              Nothing -> val_ True
-          )
-          $ all_ (submissions submitDb)
-        )
-          
+    runSelectReturningList $ select (all_ (submissions submitDb))
 
 addSubmission :: User -> Assignment -> IO (Maybe Submission)
 addSubmission user assignment = do

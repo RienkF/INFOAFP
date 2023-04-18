@@ -8,7 +8,6 @@ module Api.Spec where
 import Api.Types.AssignmentTypes (AddAssignmentBody)
 import Api.Types.ClassroomTypes
 import Api.Types.SubmissionTypes (AddSubmissionBody)
-import Api.Types.AttemptTypes (AddAttemptBody)
 import Api.Types.UserTypes
 import Data.Aeson
 import Data.Functor.Identity (Identity)
@@ -32,13 +31,10 @@ type Spec =
              :<|> "add" :> ReqBody '[JSON] AddAssignmentBody :> Post '[JSON] (Maybe Assignment)
          )
     :<|> "submissions"
-      :> ( QueryParam "submissionIds" [Int] :> Get '[JSON] [Submission]
+      :> ( Get '[JSON] [Submission]
              :<|> "add" :> ReqBody '[JSON] AddSubmissionBody :> Post '[JSON] (Maybe Submission)
          )
-    :<|> "attempts" 
-      :> ( QueryParam "attemptIds" [Int] :> Get '[JSON] [Attempt]
-             :<|> "add" :> ReqBody '[JSON] AddAttemptBody :> Post '[JSON] (Maybe Attempt)
-         )
+    :<|> "attempts" :> QueryParam "attemptIds" [Int] :> Get '[JSON] [Attempt]
     :<|> "gradings" :> Get '[JSON] [Grading]
     :<|> Raw -- This final raw is just so we can serve the index file of the frontend
 

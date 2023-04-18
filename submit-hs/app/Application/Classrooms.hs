@@ -8,8 +8,8 @@ import qualified Database.Users
 import Servant
 import Api.Types.ClassroomTypes
 
-getClassrooms :: Handler [Classroom]
-getClassrooms = liftIO $ Database.Classrooms.getClassrooms Nothing
+getClassrooms :: IO [Classroom]
+getClassrooms = Database.Classrooms.getClassrooms Nothing
 
 getClassroomParticipants :: Handler [ClassroomParticipant]
 getClassroomParticipants = liftIO Database.Classrooms.getClassroomParticipants
