@@ -3,21 +3,34 @@ module Database.Classrooms where
 import Data.String
 import Database.Beam
 import Database.Beam.Sqlite
-import Database.Db (SubmitDb (classroomParticipants, classrooms), databaseConnection, submitDb)
+import Database.Db (SubmitDb (classroomParticipants, classrooms, users), databaseConnection, submitDb)
 import Database.Model
 
-getClassrooms :: Maybe [Int] -> IO [Classroom]
-getClassrooms classRoomFilter = do
+getClassrooms :: Maybe [Int] -> Maybe [Int] -> IO [Classroom]
+getClassrooms classRoomFilter userIdFilter = do
   conn <- databaseConnection
   runBeamSqlite conn $ do
-    runSelectReturningList $ select 
-      ( filter_
-        ( \classroom -> case classRoomFilter of
-            Just filter -> _classroomId classroom `in_` map fromIntegral filter
-            Nothing -> val_ True
-        )
-        $ all_ (classrooms submitDb)
-      )
+    runSelectReturningList $
+      select $ do
+        classrooms <- all_ (classrooms submitDb)
+        case classRoomFilter of
+          Just filter -> guard_ $ _classroomId classrooms `in_` map fromIntegral filter
+          Nothing -> guard_ $ val_ True
+        case userIdFilter of
+          Just filter -> do
+            users <- all_ (users submitDb)
+            classroomParticipants <- all_ (classroomParticipants submitDb)
+
+            guard_
+              ( primaryKey classrooms
+                  ==. _classroomParticipantClassroom classroomParticipants
+                  &&. _classroomParticipantUser classroomParticipants
+                  ==. primaryKey users
+                  &&. _userId users
+                  `in_` map fromIntegral filter
+              )
+          Nothing -> guard_ $ val_ True
+        pure classrooms
 
 getClassroomParticipants :: IO [ClassroomParticipant]
 getClassroomParticipants = do

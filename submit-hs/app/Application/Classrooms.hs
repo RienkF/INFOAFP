@@ -1,15 +1,15 @@
 module Application.Classrooms where
 
+import Api.Types.ClassroomTypes
 import Database.Beam
 import qualified Database.Classrooms
 import Database.Model
 import qualified Database.Model as Database
 import qualified Database.Users
 import Servant
-import Api.Types.ClassroomTypes
 
-getClassrooms :: IO [Classroom]
-getClassrooms = Database.Classrooms.getClassrooms Nothing
+getClassrooms :: Maybe [Int] -> Maybe [Int] -> Handler [Classroom]
+getClassrooms classroomIds userIds = liftIO $ Database.Classrooms.getClassrooms classroomIds userIds
 
 getClassroomParticipants :: Handler [ClassroomParticipant]
 getClassroomParticipants = liftIO Database.Classrooms.getClassroomParticipants

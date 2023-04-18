@@ -16,7 +16,7 @@ getAssignments = Database.Assignments.getAssignments Nothing
 
 addAssignment :: AddAssignmentBody -> Handler (Maybe Assignment)
 addAssignment body = do
-  classrooms <- liftIO $ Database.Classrooms.getClassrooms $ Just [assignmentClassroom body]
+  classrooms <- liftIO $ Database.Classrooms.getClassrooms (Just [assignmentClassroom body]) Nothing
 
   case classrooms of
     [classroom] ->

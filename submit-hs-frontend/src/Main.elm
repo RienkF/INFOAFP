@@ -109,6 +109,10 @@ update msg model =
             Pages.Register.update registerMsg registerModel
                 |> updateWith RegisterModel RegisterMsg model
 
+        ( ClassroomsMsg classroomsMsg, ClassroomsModel classroomsModel ) ->
+            Pages.Classrooms.update classroomsMsg classroomsModel
+                |> updateWith ClassroomsModel ClassroomsMsg model
+
         ( NoMsg, _ ) ->
             ( model, Platform.Cmd.none )
 

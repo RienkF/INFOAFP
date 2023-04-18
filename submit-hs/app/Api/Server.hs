@@ -29,7 +29,7 @@ server :: Server Api.Spec.Spec
 server =
   ( getUsers :<|> addUser
   )
-    :<|> (liftIO getClassrooms :<|> addClassroom)
+    :<|> (getClassrooms :<|> addClassroom)
     :<|> getClassroomParticipants
     :<|> (liftIO getAssignments :<|> addAssignment)
     :<|> (liftIO getSubmissions :<|> addSubmission)

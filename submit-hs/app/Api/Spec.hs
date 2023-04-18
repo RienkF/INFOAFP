@@ -22,7 +22,7 @@ type Spec =
            :<|> "add" :> ReqBody '[JSON] AddUserBody :> Post '[JSON] (Maybe User)
        )
     :<|> "classrooms"
-      :> ( Get '[JSON] [Classroom]
+      :> ( QueryParam "classroomIds" [Int] :> QueryParam "userIds" [Int] :> Get '[JSON] [Classroom]
              :<|> "add" :> ReqBody '[JSON] AddClassroomBody :> Post '[JSON] (Maybe Classroom)
          )
     :<|> "classroomParticipants" :> Get '[JSON] [ClassroomParticipant]

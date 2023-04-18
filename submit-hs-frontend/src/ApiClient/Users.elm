@@ -3,6 +3,7 @@ module ApiClient.Users exposing (..)
 import Http exposing (jsonBody)
 import Json.Decode as Decode exposing (Decoder, Value, andThen, fail, field, int, list, map3, maybe, succeed)
 import Json.Encode as Encode exposing (object)
+import String exposing (fromInt)
 
 
 type alias Users =
@@ -86,6 +87,14 @@ getUsers : Cmd Msg
 getUsers =
     Http.get
         { url = "http://localhost:3000/users"
+        , expect = Http.expectJson DataReceived (list userDecoder)
+        }
+
+
+getUser : Int -> Cmd Msg
+getUser userId =
+    Http.get
+        { url = "http://localhost:3000/users?userIds=" ++ fromInt userId
         , expect = Http.expectJson DataReceived (list userDecoder)
         }
 
