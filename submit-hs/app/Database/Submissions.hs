@@ -5,8 +5,8 @@ import Database.Beam.Sqlite
 import Database.Db (SubmitDb (submissions, assignments), databaseConnection, submitDb)
 import Database.Model
 
-getSubmissions :: IO [Submission]
-getSubmissions = do
+getSubmissions :: Maybe [Int] -> IO [Submission]
+getSubmissions idFilter = do
   conn <- databaseConnection
   runBeamSqlite conn $ do
     runSelectReturningList $ select (all_ (submissions submitDb))

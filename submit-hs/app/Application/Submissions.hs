@@ -13,7 +13,7 @@ import Control.Monad.IO.Class
 import qualified Database.Assignments
 
 getSubmissions :: IO [Submission]
-getSubmissions = Database.Submissions.getSubmissions
+getSubmissions = Database.Submissions.getSubmissions Nothing
 
 addSubmission :: AddSubmissionBody -> Handler (Maybe Submission)
 addSubmission body = do

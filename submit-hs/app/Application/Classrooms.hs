@@ -11,8 +11,8 @@ import Api.Types.ClassroomTypes
 getClassrooms :: IO [Classroom]
 getClassrooms = Database.Classrooms.getClassrooms Nothing
 
-getClassroomParticipants :: IO [ClassroomParticipant]
-getClassroomParticipants = Database.Classrooms.getClassroomParticipants
+getClassroomParticipants :: Handler [ClassroomParticipant]
+getClassroomParticipants = liftIO Database.Classrooms.getClassroomParticipants
 
 addClassroom :: AddClassroomBody -> Handler (Maybe Classroom)
 addClassroom body = do

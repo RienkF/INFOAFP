@@ -30,11 +30,11 @@ server =
   ( getUsers :<|> addUser
   )
     :<|> (liftIO getClassrooms :<|> addClassroom)
-    :<|> liftIO getClassroomParticipants
+    :<|> getClassroomParticipants
     :<|> (liftIO getAssignments :<|> addAssignment)
     :<|> (liftIO getSubmissions :<|> addSubmission)
-    :<|> liftIO getAttempts
-    :<|> liftIO getGradings
+    :<|> getAttempts
+    :<|> getGradings
     :<|> serveDirectoryFileServer "static/"
 
 application :: Application
