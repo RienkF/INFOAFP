@@ -8,6 +8,7 @@ type Route
     = Login
     | Register
     | Classrooms Int
+    | AddClassroom Int
 
 
 parser : Parser (Route -> a) a
@@ -16,6 +17,7 @@ parser =
         [ Parser.map Login (s "login")
         , Parser.map Register (s "register")
         , Parser.map Classrooms (s "users" </> int </> s "classrooms")
+        , Parser.map AddClassroom (s "users" </> int </> s "classrooms" </> s "add")
         ]
 
 

@@ -1,7 +1,8 @@
 module ApiClient.Classrooms exposing (..)
 
-import Http
-import Json.Decode as Decode exposing (Decoder, field, int, list, map2)
+import Http exposing (jsonBody)
+import Json.Decode as Decode exposing (Decoder, Value, field, int, list, map2, maybe)
+import Json.Encode as Encode exposing (object)
 import String exposing (fromInt)
 
 
@@ -16,6 +17,7 @@ type alias Classroom =
 type Msg
     = SendHttpRequest
     | DataReceived (Result Http.Error (List Classroom))
+    | ClassroomCreated (Result Http.Error (Maybe Classroom))
 
 
 classroomDecoder : Decoder Classroom
@@ -31,3 +33,20 @@ getUserClassrooms userId =
         { url = "http://localhost:3000/classrooms?userIds=" ++ fromInt userId
         , expect = Http.expectJson DataReceived (list classroomDecoder)
         }
+
+
+createClassroom : String -> Int -> Cmd Msg
+createClassroom classname teacherId =
+    Http.post
+        { body = jsonBody (encodeClassroomBody classname teacherId)
+        , expect = Http.expectJson ClassroomCreated (maybe classroomDecoder)
+        , url = "http://localhost:3000/classrooms/add"
+        }
+
+
+encodeClassroomBody : String -> Int -> Value
+encodeClassroomBody className teacherId =
+    object
+        [ ( "classroomName", Encode.string className )
+        , ( "teacherId", Encode.int teacherId )
+        ]

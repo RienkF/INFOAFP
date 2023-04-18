@@ -7,6 +7,7 @@ import Browser exposing (Document, application)
 import Browser.Navigation exposing (Key, load)
 import Html exposing (div)
 import Html.Attributes exposing (style)
+import Pages.AddClassroom
 import Pages.Classrooms exposing (Model, Msg)
 import Pages.Login exposing (Model, Msg(..), init)
 import Pages.Register
@@ -25,6 +26,7 @@ type Model
     = LoginModel Pages.Login.Model
     | RegisterModel Pages.Register.Model
     | ClassroomsModel Pages.Classrooms.Model
+    | AddClassroomModel Pages.AddClassroom.Model
 
 
 init : () -> Url.Url -> Key -> ( Model, Cmd Msg )
@@ -56,6 +58,9 @@ view model =
         ClassroomsModel classroomsModel ->
             useView (Pages.Classrooms.view classroomsModel) ClassroomsMsg
 
+        AddClassroomModel addClassroomsModel ->
+            useView (Pages.AddClassroom.view addClassroomsModel) AddClassroomMsg
+
 
 useView : Document a -> (a -> Msg) -> Document Msg
 useView result mapMsg =
@@ -72,6 +77,7 @@ type Msg
     | LoginMsg Pages.Login.Msg
     | RegisterMsg Pages.Register.Msg
     | ClassroomsMsg Pages.Classrooms.Msg
+    | AddClassroomMsg Pages.AddClassroom.Msg
     | NoMsg
 
 
@@ -93,6 +99,10 @@ changeRouteTo maybeRoute model =
         Just (Route.Classrooms userId) ->
             Pages.Classrooms.init (getKey model) userId
                 |> updateWith ClassroomsModel ClassroomsMsg model
+
+        Just (Route.AddClassroom userId) ->
+            Pages.AddClassroom.init (getKey model) userId
+                |> updateWith AddClassroomModel AddClassroomMsg model
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -123,6 +133,10 @@ update msg model =
             Pages.Classrooms.update classroomsMsg classroomsModel
                 |> updateWith ClassroomsModel ClassroomsMsg model
 
+        ( AddClassroomMsg addClassroomMsg, AddClassroomModel addClassroomsModel ) ->
+            Pages.AddClassroom.update addClassroomMsg addClassroomsModel
+                |> updateWith AddClassroomModel AddClassroomMsg model
+
         ( NoMsg, _ ) ->
             ( model, Platform.Cmd.none )
 
@@ -142,6 +156,9 @@ getKey model =
 
         ClassroomsModel classroomsModel ->
             classroomsModel.navKey
+
+        AddClassroomModel addClassroomModel ->
+            addClassroomModel.navKey
 
 
 updateWith : (subModel -> Model) -> (subMsg -> Msg) -> Model -> ( subModel, Cmd subMsg ) -> ( Model, Cmd Msg )

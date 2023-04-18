@@ -1,11 +1,12 @@
 module Pages.Classrooms exposing (..)
 
 import ApiClient.Classrooms exposing (Classrooms, getUserClassrooms)
-import ApiClient.Users exposing (User, getUser)
+import ApiClient.Users exposing (User, UserType(..), getUser)
 import Browser exposing (Document)
-import Browser.Navigation exposing (Key)
-import Html exposing (a, li, p, text, ul)
+import Browser.Navigation exposing (Key, pushUrl)
+import Html exposing (a, button, div, li, p, text, ul)
 import Html.Attributes exposing (href)
+import Html.Events exposing (onClick)
 import List exposing (map)
 import String exposing (fromInt)
 import Util exposing (loadingIfNothing)
@@ -38,8 +39,22 @@ view { userData, classroomData } =
                     [ text ("Classrooms of " ++ user.userName ++ ":")
                     , loadingIfNothing classroomData
                         (\classrooms ->
-                            ul [] (map (\{ id, name } -> li [] [ a [ href ("users/" ++ fromInt user.id ++ "/classrooms/" ++ fromInt id) ] [ text name ] ]) classrooms)
+                            ul []
+                                (map
+                                    (\{ id, name } ->
+                                        li
+                                            []
+                                            [ a [ href ("users/" ++ fromInt user.id ++ "/classrooms/" ++ fromInt id) ] [ text name ] ]
+                                    )
+                                    classrooms
+                                )
                         )
+                    , case user.userType of
+                        Teacher ->
+                            button [ onClick AddClicked ] [ text "Add classroom" ]
+
+                        _ ->
+                            div [] []
                     ]
             )
         ]
@@ -86,11 +101,11 @@ update msg model =
         ClassroomsMsg _ ->
             ( model, Cmd.none )
 
-        NoMsg ->
-            ( model, Cmd.none )
+        AddClicked ->
+            ( model, pushUrl model.navKey ("/users/" ++ fromInt model.userId ++ "/classrooms/add") )
 
 
 type Msg
-    = NoMsg
+    = AddClicked
     | UsersMsg ApiClient.Users.Msg
     | ClassroomsMsg ApiClient.Classrooms.Msg
