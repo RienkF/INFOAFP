@@ -156,10 +156,10 @@ update msg model =
             ( model, Cmd.none )
 
         AddParticipantClicked ->
-            ( model, pushUrl model.navKey <| "/users/" ++ fromInt model.userId ++ "/classrooms/addParticipant" )
+            ( model, pushUrl model.navKey <| "/users/" ++ fromInt model.userId ++ "/classrooms/" ++ fromInt model.classroomId ++ "/addParticipant" )
 
         AddAssignmentClicked ->
-            ( model, pushUrl model.navKey <| "/users/" ++ fromInt model.userId ++ "/classrooms/" ++ fromInt model.classroomId ++ "assignments/add" )
+            ( model, pushUrl model.navKey <| "/users/" ++ fromInt model.userId ++ "/classrooms/" ++ fromInt model.classroomId ++ "/assignments/add" )
 
 
 type Msg

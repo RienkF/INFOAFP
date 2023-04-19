@@ -7,7 +7,6 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Platform.Cmd exposing (none)
-import RouteEvent exposing (RouteEvent(..))
 
 
 

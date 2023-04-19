@@ -8,7 +8,6 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Pages.Classrooms exposing (Msg(..))
 import Platform.Cmd exposing (none)
-import RouteEvent exposing (RouteEvent(..))
 import String exposing (fromInt)
 
 
@@ -78,4 +77,4 @@ update msg model =
             ( { model | className = classname }, none )
 
         CreateClassroom ->
-            ( model, Cmd.map ClassroomMsg (createClassroom model.className model.userId) )
+            ( model, Cmd.map ClassroomMsg <| createClassroom model.className model.userId )

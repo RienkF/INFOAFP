@@ -8,6 +8,7 @@ import Browser.Navigation exposing (Key, load)
 import Html exposing (div)
 import Html.Attributes exposing (style)
 import Pages.AddClassroom
+import Pages.AddParticipant
 import Pages.Classroom
 import Pages.Classrooms exposing (Model, Msg)
 import Pages.Login exposing (Model, Msg(..), init)
@@ -15,7 +16,6 @@ import Pages.Register
 import Platform.Cmd
 import Platform.Sub
 import Route exposing (Route(..))
-import RouteEvent exposing (RouteEvent(..))
 import Url exposing (Url)
 
 
@@ -29,6 +29,7 @@ type Model
     | ClassroomsModel Pages.Classrooms.Model
     | ClassroomModel Pages.Classroom.Model
     | AddClassroomModel Pages.AddClassroom.Model
+    | AddParticipantModel Pages.AddParticipant.Model
 
 
 init : () -> Url.Url -> Key -> ( Model, Cmd Msg )
@@ -66,6 +67,9 @@ view model =
         AddClassroomModel addClassroomsModel ->
             useView (Pages.AddClassroom.view addClassroomsModel) AddClassroomMsg
 
+        AddParticipantModel addParticipantModel ->
+            useView (Pages.AddParticipant.view addParticipantModel) AddParticipantMsg
+
 
 useView : Document a -> (a -> Msg) -> Document Msg
 useView result mapMsg =
@@ -84,6 +88,7 @@ type Msg
     | ClassroomsMsg Pages.Classrooms.Msg
     | ClassroomMsg Pages.Classroom.Msg
     | AddClassroomMsg Pages.AddClassroom.Msg
+    | AddParticipantMsg Pages.AddParticipant.Msg
     | NoMsg
 
 
@@ -113,6 +118,10 @@ changeRouteTo maybeRoute model =
         Just (Route.AddClassroom userId) ->
             Pages.AddClassroom.init (getKey model) userId
                 |> updateWith AddClassroomModel AddClassroomMsg model
+
+        Just (Route.AddParticipant userId classroomId) ->
+            Pages.AddParticipant.init (getKey model) userId classroomId
+                |> updateWith AddParticipantModel AddParticipantMsg model
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -151,6 +160,10 @@ update msg model =
             Pages.AddClassroom.update addClassroomMsg addClassroomsModel
                 |> updateWith AddClassroomModel AddClassroomMsg model
 
+        ( AddParticipantMsg addParticipantMsg, AddParticipantModel addParticipantModel ) ->
+            Pages.AddParticipant.update addParticipantMsg addParticipantModel
+                |> updateWith AddParticipantModel AddParticipantMsg model
+
         ( NoMsg, _ ) ->
             ( model, Platform.Cmd.none )
 
@@ -176,6 +189,9 @@ getKey model =
 
         AddClassroomModel addClassroomModel ->
             addClassroomModel.navKey
+
+        AddParticipantModel addParticipantModel ->
+            addParticipantModel.navKey
 
 
 updateWith : (subModel -> Model) -> (subMsg -> Msg) -> Model -> ( subModel, Cmd subMsg ) -> ( Model, Cmd Msg )

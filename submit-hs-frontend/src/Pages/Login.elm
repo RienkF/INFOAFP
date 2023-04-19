@@ -8,7 +8,6 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import List exposing (append)
 import Platform.Cmd exposing (none)
-import RouteEvent exposing (RouteEvent(..))
 import String exposing (fromInt, toInt)
 import Util exposing (isNothing)
 
