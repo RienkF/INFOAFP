@@ -143,8 +143,8 @@ update msg model =
 
         AssignmentsMsg (ApiClient.Assignments.DataReceived result) ->
             case result of
-                Ok assignemnts ->
-                    ( { model | assignmentsData = Just assignemnts }
+                Ok assignments ->
+                    ( { model | assignmentsData = Just assignments }
                     , Cmd.none
                     )
 

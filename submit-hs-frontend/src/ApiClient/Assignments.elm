@@ -31,6 +31,14 @@ assignmentDecoder =
         (field "_assignmentClassroom" Decode.int)
 
 
+getAssignment : Int -> Cmd Msg
+getAssignment assignmentId =
+    Http.get
+        { url = "http://localhost:3000/assignments?assignmentIds=" ++ fromInt assignmentId
+        , expect = Http.expectJson DataReceived (list assignmentDecoder)
+        }
+
+
 getClassroomAssignments : Int -> Cmd Msg
 getClassroomAssignments classroomId =
     Http.get

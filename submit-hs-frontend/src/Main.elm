@@ -4,12 +4,13 @@
 module Main exposing (main, useInit)
 
 import Browser exposing (Document, application)
-import Browser.Navigation exposing (Key, load)
+import Browser.Navigation exposing (Key, load, pushUrl)
 import Html exposing (div)
 import Html.Attributes exposing (style)
 import Pages.AddAssignment
 import Pages.AddClassroom
 import Pages.AddParticipant
+import Pages.Assignment
 import Pages.Classroom
 import Pages.Classrooms exposing (Model, Msg)
 import Pages.Login exposing (Model, Msg(..), init)
@@ -32,6 +33,7 @@ type Model
     | AddClassroomModel Pages.AddClassroom.Model
     | AddParticipantModel Pages.AddParticipant.Model
     | AddAssignmentModel Pages.AddAssignment.Model
+    | AssignmentModel Pages.Assignment.Model
 
 
 init : () -> Url.Url -> Key -> ( Model, Cmd Msg )
@@ -75,6 +77,9 @@ view model =
         AddAssignmentModel addAssignmentModel ->
             useView (Pages.AddAssignment.view addAssignmentModel) AddAssignmentMsg
 
+        AssignmentModel assignmentModel ->
+            useView (Pages.Assignment.view assignmentModel) AssignmentMsg
+
 
 useView : Document a -> (a -> Msg) -> Document Msg
 useView result mapMsg =
@@ -95,6 +100,7 @@ type Msg
     | AddClassroomMsg Pages.AddClassroom.Msg
     | AddParticipantMsg Pages.AddParticipant.Msg
     | AddAssignmentMsg Pages.AddAssignment.Msg
+    | AssignmentMsg Pages.Assignment.Msg
     | NoMsg
 
 
@@ -133,6 +139,10 @@ changeRouteTo maybeRoute model =
             Pages.AddAssignment.init (getKey model) userId classroomId
                 |> updateWith AddAssignmentModel AddAssignmentMsg model
 
+        Just (Route.Assignment userId assignmentId) ->
+            Pages.Assignment.init (getKey model) userId assignmentId
+                |> updateWith AssignmentModel AssignmentMsg model
+
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -143,7 +153,9 @@ update msg model =
         ( ClickedLink urlRequest, _ ) ->
             case urlRequest of
                 Browser.Internal url ->
-                    changeRouteTo (Route.fromUrl url) model
+                    ( model
+                    , pushUrl (getKey model) url.path
+                    )
 
                 Browser.External href ->
                     ( model
@@ -178,6 +190,10 @@ update msg model =
             Pages.AddAssignment.update addAssignmentMsg addAssignmentModel
                 |> updateWith AddAssignmentModel AddAssignmentMsg model
 
+        ( AssignmentMsg assignmentMsg, AssignmentModel assignmentModel ) ->
+            Pages.Assignment.update assignmentMsg assignmentModel
+                |> updateWith AssignmentModel AssignmentMsg model
+
         ( NoMsg, _ ) ->
             ( model, Platform.Cmd.none )
 
@@ -209,6 +225,9 @@ getKey model =
 
         AddAssignmentModel addAssignmentModel ->
             addAssignmentModel.navKey
+
+        AssignmentModel assignmentModel ->
+            assignmentModel.navKey
 
 
 updateWith : (subModel -> Model) -> (subMsg -> Msg) -> Model -> ( subModel, Cmd subMsg ) -> ( Model, Cmd Msg )
