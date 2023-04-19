@@ -27,6 +27,14 @@ classroomDecoder =
         (field "_classroomName" Decode.string)
 
 
+getClassroom : Int -> Cmd Msg
+getClassroom classroomId =
+    Http.get
+        { url = "http://localhost:3000/classrooms?classroomIds=" ++ fromInt classroomId
+        , expect = Http.expectJson DataReceived (list classroomDecoder)
+        }
+
+
 getUserClassrooms : Int -> Cmd Msg
 getUserClassrooms userId =
     Http.get

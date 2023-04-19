@@ -3,22 +3,36 @@ module Database.Users where
 import Data.String
 import Database.Beam
 import Database.Beam.Sqlite
-import Database.Db (SubmitDb (users), databaseConnection, submitDb)
+import Database.Db (SubmitDb (classroomParticipants, classrooms, users), databaseConnection, submitDb)
 import Database.Model
 
-getUsers :: Maybe [Int] -> IO [User]
-getUsers idFilter = do
+getUsers :: Maybe [Int] -> Maybe [Int] -> IO [User]
+getUsers userIds classroomIds = do
   conn <- databaseConnection
   runBeamSqlite conn $ do
     runSelectReturningList $
-      select
-        ( filter_
-            ( \user -> case idFilter of
-                Just filter -> _userId user `in_` map fromIntegral filter
-                Nothing -> val_ True
-            )
-            $ all_ (users submitDb)
-        )
+      select $ do
+        users <- all_ (users submitDb)
+        guard_ $ case userIds of
+          Just filter -> _userId users `in_` map fromIntegral filter
+          Nothing -> val_ True
+
+        case classroomIds of
+          Just filter -> do
+            classrooms <- all_ (classrooms submitDb)
+            classroomParticipants <- all_ (classroomParticipants submitDb)
+
+            guard_
+              ( primaryKey users
+                  ==. _classroomParticipantUser classroomParticipants
+                  &&. _classroomParticipantClassroom classroomParticipants
+                  ==. primaryKey classrooms
+                  &&. _classroomId classrooms
+                  `in_` map fromIntegral filter
+              )
+          Nothing -> guard_ $ val_ True
+
+        return users
 
 addUser :: String -> UserType -> IO (Maybe User)
 addUser userName userType = do

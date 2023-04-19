@@ -44,7 +44,7 @@ view { userData, classroomData } =
                                     (\{ id, name } ->
                                         li
                                             []
-                                            [ a [ href ("users/" ++ fromInt user.id ++ "/classrooms/" ++ fromInt id) ] [ text name ] ]
+                                            [ a [ href ("/users/" ++ fromInt user.id ++ "/classrooms/" ++ fromInt id) ] [ text name ] ]
                                     )
                                     classrooms
                                 )

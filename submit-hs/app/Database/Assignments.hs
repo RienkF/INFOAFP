@@ -7,19 +7,26 @@ import Database.Beam.Sqlite
 import Database.Db (SubmitDb (assignments), classrooms, databaseConnection, submitDb)
 import Database.Model
 
-getAssignments :: Maybe [Int] -> IO [Assignment]
-getAssignments assignmentFilter = do
+getAssignments :: Maybe [Int] -> Maybe [Int] -> IO [Assignment]
+getAssignments assignmentFilter classroomsFilter = do
   conn <- databaseConnection
   runBeamSqlite conn $ do
     runSelectReturningList $
-      select
-        ( filter_
-            ( \assignment -> case assignmentFilter of
-                Just filter -> _assignmentId assignment `in_` Prelude.map fromIntegral filter
-                Nothing -> val_ True
-            )
-            $ all_ (assignments submitDb)
-        )
+      select $ do
+        assignments <- all_ (assignments submitDb)
+        case assignmentFilter of
+          Just filter -> guard_ $ _assignmentId assignments `in_` Prelude.map fromIntegral filter
+          Nothing -> guard_ $ val_ True
+        case classroomsFilter of
+          Just filter -> do
+            classrooms <- all_ (classrooms submitDb)
+            guard_ $
+              _classroomId classrooms
+                `in_` Prelude.map fromIntegral filter
+                &&. _assignmentClassroom assignments
+                ==. primaryKey classrooms
+          Nothing -> guard_ $ val_ True
+        return assignments
 
 addAssignment :: LocalTime -> LocalTime -> Text -> Double -> Classroom -> IO (Maybe Assignment)
 addAssignment startDate deadline description weight classroom = do

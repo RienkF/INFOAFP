@@ -3,14 +3,14 @@
 
 module Api.Types.AssignmentTypes where
 
-import GHC.Generics
-import Database.Model
+import Api.Types.SubmissionTypes (AddSubmissionBody (assignmentId))
 import Data.Aeson
 import Data.Aeson.Types
-import Api.Types.SubmissionTypes (AddSubmissionBody(assignmentId))
-import Data.Time (LocalTime)
 import Data.Int (Int32)
 import Data.Text
+import Data.Time (LocalTime)
+import Database.Model
+import GHC.Generics
 
 data AddAssignmentBody = AddAssignmentBody
   { assignmentStartDate :: LocalTime,

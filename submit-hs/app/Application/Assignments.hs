@@ -11,8 +11,8 @@ import qualified Database.Model as Database
 import qualified Database.Users
 import Servant
 
-getAssignments :: IO [Assignment]
-getAssignments = Database.Assignments.getAssignments Nothing
+getAssignments :: Maybe [Int] -> Maybe [Int] -> Handler [Assignment]
+getAssignments assignmentIds classroomIds = liftIO $ Database.Assignments.getAssignments assignmentIds classroomIds
 
 addAssignment :: AddAssignmentBody -> Handler (Maybe Assignment)
 addAssignment body = do

@@ -16,7 +16,7 @@ getClassroomParticipants = liftIO Database.Classrooms.getClassroomParticipants
 
 addClassroom :: AddClassroomBody -> Handler (Maybe Classroom)
 addClassroom body = do
-  teacherMaybe <- liftIO $ Database.Users.getUsers $ Just [teacherId body]
+  teacherMaybe <- liftIO $ Database.Users.getUsers (Just [teacherId body]) Nothing
   case teacherMaybe of
     -- Require the given user to be a teacher
     [teacher@(User _ Teacher _)] -> do
@@ -35,7 +35,7 @@ addClassroomParticipant body = do
   classrooms <- liftIO $ Database.Classrooms.getClassrooms (Just [classroomId body]) Nothing
   case classrooms of
     [classroom] -> do
-      users <- liftIO $ Database.Users.getUsers $ Just [userId body]
+      users <- liftIO $ Database.Users.getUsers (Just [userId body]) Nothing
       case users of
         [user] ->
           liftIO $

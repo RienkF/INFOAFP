@@ -18,7 +18,7 @@ import Servant
 
 type Spec =
   "users"
-    :> ( QueryParam "userIds" [Int] :> Get '[JSON] [User]
+    :> ( QueryParam "userIds" [Int] :> QueryParam "classroomIds" [Int] :> Get '[JSON] [User]
            :<|> "add" :> ReqBody '[JSON] AddUserBody :> Post '[JSON] (Maybe User)
        )
     :<|> "classrooms"
@@ -27,7 +27,7 @@ type Spec =
          )
     :<|> "classroomParticipants" :> Get '[JSON] [ClassroomParticipant]
     :<|> "assignments"
-      :> ( Get '[JSON] [Assignment]
+      :> ( QueryParam "assignmentIds" [Int] :> QueryParam "classroomIds" [Int] :> Get '[JSON] [Assignment]
              :<|> "add" :> ReqBody '[JSON] AddAssignmentBody :> Post '[JSON] (Maybe Assignment)
          )
     :<|> "submissions"

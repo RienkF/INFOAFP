@@ -1,13 +1,13 @@
 module Application.Users where
 
+import Api.Types.UserTypes
 import Control.Monad.IO.Class
 import Database.Model
 import qualified Database.Users
 import Servant
-import Api.Types.UserTypes
 
-getUsers :: Maybe [Int] -> Handler [User]
-getUsers idFilter = liftIO $ Database.Users.getUsers idFilter
+getUsers :: Maybe [Int] -> Maybe [Int] -> Handler [User]
+getUsers userIds classroomIds = liftIO $ Database.Users.getUsers userIds classroomIds
 
 -- TODO: Add username validation
 addUser :: AddUserBody -> Handler (Maybe User)

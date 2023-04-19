@@ -52,6 +52,7 @@ stringToUserType userType =
 type Msg
     = SendHttpRequest
     | DataReceived (Result Http.Error (List User))
+    | ClassroomUsersDataReceived (Result Http.Error (List User))
     | UserCreated (Result Http.Error (Maybe User))
 
 
@@ -96,6 +97,14 @@ getUser userId =
     Http.get
         { url = "http://localhost:3000/users?userIds=" ++ fromInt userId
         , expect = Http.expectJson DataReceived (list userDecoder)
+        }
+
+
+getClassroomUsers : Int -> Cmd Msg
+getClassroomUsers classroomId =
+    Http.get
+        { url = "http://localhost:3000/users?classroomIds=" ++ fromInt classroomId
+        , expect = Http.expectJson ClassroomUsersDataReceived (list userDecoder)
         }
 
 

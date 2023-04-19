@@ -31,7 +31,7 @@ server =
   )
     :<|> (getClassrooms :<|> addClassroom)
     :<|> getClassroomParticipants
-    :<|> (liftIO getAssignments :<|> addAssignment)
+    :<|> (getAssignments :<|> addAssignment)
     :<|> (liftIO getSubmissions :<|> addSubmission)
     :<|> getAttempts
     :<|> getGradings

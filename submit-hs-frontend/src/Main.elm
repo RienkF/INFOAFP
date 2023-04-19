@@ -8,6 +8,7 @@ import Browser.Navigation exposing (Key, load)
 import Html exposing (div)
 import Html.Attributes exposing (style)
 import Pages.AddClassroom
+import Pages.Classroom
 import Pages.Classrooms exposing (Model, Msg)
 import Pages.Login exposing (Model, Msg(..), init)
 import Pages.Register
@@ -26,6 +27,7 @@ type Model
     = LoginModel Pages.Login.Model
     | RegisterModel Pages.Register.Model
     | ClassroomsModel Pages.Classrooms.Model
+    | ClassroomModel Pages.Classroom.Model
     | AddClassroomModel Pages.AddClassroom.Model
 
 
@@ -58,6 +60,9 @@ view model =
         ClassroomsModel classroomsModel ->
             useView (Pages.Classrooms.view classroomsModel) ClassroomsMsg
 
+        ClassroomModel classroomModel ->
+            useView (Pages.Classroom.view classroomModel) ClassroomMsg
+
         AddClassroomModel addClassroomsModel ->
             useView (Pages.AddClassroom.view addClassroomsModel) AddClassroomMsg
 
@@ -77,6 +82,7 @@ type Msg
     | LoginMsg Pages.Login.Msg
     | RegisterMsg Pages.Register.Msg
     | ClassroomsMsg Pages.Classrooms.Msg
+    | ClassroomMsg Pages.Classroom.Msg
     | AddClassroomMsg Pages.AddClassroom.Msg
     | NoMsg
 
@@ -99,6 +105,10 @@ changeRouteTo maybeRoute model =
         Just (Route.Classrooms userId) ->
             Pages.Classrooms.init (getKey model) userId
                 |> updateWith ClassroomsModel ClassroomsMsg model
+
+        Just (Route.Classroom userId classroomId) ->
+            Pages.Classroom.init (getKey model) userId classroomId
+                |> updateWith ClassroomModel ClassroomMsg model
 
         Just (Route.AddClassroom userId) ->
             Pages.AddClassroom.init (getKey model) userId
@@ -133,6 +143,10 @@ update msg model =
             Pages.Classrooms.update classroomsMsg classroomsModel
                 |> updateWith ClassroomsModel ClassroomsMsg model
 
+        ( ClassroomMsg classroomMsg, ClassroomModel classroomModel ) ->
+            Pages.Classroom.update classroomMsg classroomModel
+                |> updateWith ClassroomModel ClassroomMsg model
+
         ( AddClassroomMsg addClassroomMsg, AddClassroomModel addClassroomsModel ) ->
             Pages.AddClassroom.update addClassroomMsg addClassroomsModel
                 |> updateWith AddClassroomModel AddClassroomMsg model
@@ -156,6 +170,9 @@ getKey model =
 
         ClassroomsModel classroomsModel ->
             classroomsModel.navKey
+
+        ClassroomModel classroomModel ->
+            classroomModel.navKey
 
         AddClassroomModel addClassroomModel ->
             addClassroomModel.navKey
