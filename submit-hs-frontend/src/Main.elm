@@ -7,6 +7,7 @@ import Browser exposing (Document, application)
 import Browser.Navigation exposing (Key, load)
 import Html exposing (div)
 import Html.Attributes exposing (style)
+import Pages.AddAssignment
 import Pages.AddClassroom
 import Pages.AddParticipant
 import Pages.Classroom
@@ -30,6 +31,7 @@ type Model
     | ClassroomModel Pages.Classroom.Model
     | AddClassroomModel Pages.AddClassroom.Model
     | AddParticipantModel Pages.AddParticipant.Model
+    | AddAssignmentModel Pages.AddAssignment.Model
 
 
 init : () -> Url.Url -> Key -> ( Model, Cmd Msg )
@@ -70,6 +72,9 @@ view model =
         AddParticipantModel addParticipantModel ->
             useView (Pages.AddParticipant.view addParticipantModel) AddParticipantMsg
 
+        AddAssignmentModel addAssignmentModel ->
+            useView (Pages.AddAssignment.view addAssignmentModel) AddAssignmentMsg
+
 
 useView : Document a -> (a -> Msg) -> Document Msg
 useView result mapMsg =
@@ -89,6 +94,7 @@ type Msg
     | ClassroomMsg Pages.Classroom.Msg
     | AddClassroomMsg Pages.AddClassroom.Msg
     | AddParticipantMsg Pages.AddParticipant.Msg
+    | AddAssignmentMsg Pages.AddAssignment.Msg
     | NoMsg
 
 
@@ -122,6 +128,10 @@ changeRouteTo maybeRoute model =
         Just (Route.AddParticipant userId classroomId) ->
             Pages.AddParticipant.init (getKey model) userId classroomId
                 |> updateWith AddParticipantModel AddParticipantMsg model
+
+        Just (Route.AddAssignment userId classroomId) ->
+            Pages.AddAssignment.init (getKey model) userId classroomId
+                |> updateWith AddAssignmentModel AddAssignmentMsg model
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -164,6 +174,10 @@ update msg model =
             Pages.AddParticipant.update addParticipantMsg addParticipantModel
                 |> updateWith AddParticipantModel AddParticipantMsg model
 
+        ( AddAssignmentMsg addAssignmentMsg, AddAssignmentModel addAssignmentModel ) ->
+            Pages.AddAssignment.update addAssignmentMsg addAssignmentModel
+                |> updateWith AddAssignmentModel AddAssignmentMsg model
+
         ( NoMsg, _ ) ->
             ( model, Platform.Cmd.none )
 
@@ -192,6 +206,9 @@ getKey model =
 
         AddParticipantModel addParticipantModel ->
             addParticipantModel.navKey
+
+        AddAssignmentModel addAssignmentModel ->
+            addAssignmentModel.navKey
 
 
 updateWith : (subModel -> Model) -> (subMsg -> Msg) -> Model -> ( subModel, Cmd subMsg ) -> ( Model, Cmd Msg )
