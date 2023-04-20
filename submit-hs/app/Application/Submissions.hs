@@ -12,8 +12,8 @@ import qualified Database.Submissions
 import qualified Database.Submissions as Database.Submission
 import Servant
 
-getSubmissions :: IO [Submission]
-getSubmissions = Database.Submissions.getSubmissions Nothing
+getSubmissions :: Maybe [Int] -> Maybe [Int] -> Maybe [Int] -> Handler [Submission]
+getSubmissions submissionIds userIds assignmentIds = liftIO $ Database.Submissions.getSubmissions submissionIds userIds assignmentIds
 
 addSubmission :: AddSubmissionBody -> Handler (Maybe Submission)
 addSubmission body = do

@@ -4,7 +4,7 @@
 module Api.Server where
 
 import Api.Spec
-import Application.Assignments
+import Application.Assignments (addAssignment, getAssignments)
 import Application.Attempts
 import Application.Classrooms
 import Application.Gradings
@@ -32,7 +32,7 @@ server =
     :<|> (getClassrooms :<|> addClassroom)
     :<|> (getClassroomParticipants :<|> addClassroomParticipant)
     :<|> (getAssignments :<|> addAssignment)
-    :<|> (liftIO getSubmissions :<|> addSubmission)
+    :<|> (getSubmissions :<|> addSubmission)
     :<|> getAttempts
     :<|> getGradings
     :<|> serveDirectoryFileServer "static/"

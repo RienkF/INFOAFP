@@ -1,18 +1,18 @@
 module Application.Attempts where
 
-import qualified Database.Submissions
-import qualified Database.Attempts
-import Database.Model
 import Api.Types.AttemptTypes
-import Servant
+import qualified Database.Attempts
 import Database.Beam
+import Database.Model
+import qualified Database.Submissions
+import Servant
 
 getAttempts :: Maybe [Int] -> Handler [Attempt]
 getAttempts idFilter = liftIO $ Database.Attempts.getAttempts idFilter
 
 addAttempt :: AddAttemptBody -> Handler (Maybe Attempt)
 addAttempt body = do
-  submissions <- liftIO $ Database.Submissions.getSubmissions $ Just [submissionId body]
+  submissions <- liftIO $ Database.Submissions.getSubmissions (Just [submissionId body]) Nothing Nothing
 
   case submissions of
     [submission] ->
