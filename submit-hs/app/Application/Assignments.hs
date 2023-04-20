@@ -28,3 +28,8 @@ addAssignment body = do
           (assignmentWeight body)
           classroom
     _ -> return Nothing
+
+deleteAssignment :: Maybe Int -> Handler ()
+deleteAssignment mId = case mId of
+  Just id -> liftIO $ Database.Assignments.deleteAssignment id
+  _ -> return ()

@@ -4,7 +4,7 @@
 module Api.Server where
 
 import Api.Spec
-import Application.Assignments (addAssignment, getAssignments)
+import Application.Assignments (addAssignment, getAssignments, deleteAssignment)
 import Application.Attempts
 import Application.Classrooms
 import Application.Gradings
@@ -31,7 +31,7 @@ server =
   )
     :<|> (getClassrooms :<|> addClassroom)
     :<|> (getClassroomParticipants :<|> addClassroomParticipant)
-    :<|> (getAssignments :<|> addAssignment)
+    :<|> (getAssignments :<|> addAssignment :<|> deleteAssignment)
     :<|> (getSubmissions :<|> addSubmission)
     :<|> (getAttempts :<|> addAttempt)
     :<|> (getGradings :<|> addGrading)

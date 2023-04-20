@@ -34,6 +34,7 @@ type Spec =
     :<|> "assignments"
       :> ( QueryParam "assignmentIds" [Int] :> QueryParam "classroomIds" [Int] :> Get '[JSON] [Assignment]
              :<|> "add" :> ReqBody '[JSON] AddAssignmentBody :> Post '[JSON] (Maybe Assignment)
+             :<|> "delete" :> QueryParam "assignmentId" Int :> Delete '[JSON] ()
          )
     :<|> "submissions"
       :> ( QueryParam "submissionIds" [Int] :> QueryParam "userIds" [Int] :> QueryParam "assignmentIds" [Int] :> Get '[JSON] [Submission]
