@@ -2,7 +2,7 @@ module Pages.Assignment exposing (..)
 
 import ApiClient.Assignments exposing (Assignment, getAssignment)
 import ApiClient.Attempts exposing (Attempts, getSubmissionAttempts)
-import ApiClient.Grading exposing (Grading, getGradings)
+import ApiClient.Grading exposing (Grading, Gradings, getAssignmentGrades, getGradings)
 import ApiClient.Submissions exposing (Submission, Submissions, getAssignmentSubmissions, getUserSubmission)
 import ApiClient.Users exposing (User, UserType(..), Users, getClassroomUsers, getReviewer, getUser)
 import Browser exposing (Document)
@@ -21,7 +21,7 @@ import Util exposing (Either(..), findBy, loadingIfNothing)
 
 init : Key -> Int -> Int -> ( Model, Cmd Msg )
 init navKey userId assignmentId =
-    ( Model navKey userId Nothing assignmentId Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+    ( Model navKey userId Nothing assignmentId Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
     , Cmd.batch
         [ Cmd.map UsersMsg (getUser userId)
         , Cmd.map AssignmentsMsg (getAssignment assignmentId)
@@ -37,6 +37,7 @@ type alias Model =
     , assignmentData : Maybe Assignment
     , participantsData : Maybe Users
     , participantsSubmissions : Maybe Submissions
+    , participantsGrades : Maybe Gradings
     , userSubmission : Maybe (Either Submission Bool)
     , userAttempts : Maybe Attempts
     , userGrade : Maybe (Either Grading Bool)
@@ -49,7 +50,7 @@ type alias Model =
 
 
 view : Model -> Document Msg
-view { userId, userData, assignmentData, participantsData, participantsSubmissions, userSubmission, userAttempts, userGrade, reviewer } =
+view { userId, userData, assignmentData, participantsData, participantsSubmissions, userSubmission, userAttempts, userGrade, reviewer, participantsGrades } =
     { title = "Assignment"
     , body =
         [ loadingIfNothing assignmentData <|
@@ -129,9 +130,20 @@ view { userId, userData, assignmentData, participantsData, participantsSubmissio
                                                                             Just submission ->
                                                                                 span []
                                                                                     [ text "has submitted: "
-                                                                                    , a
-                                                                                        [ href <| "/users/" ++ fromInt userId ++ "/submissions/" ++ fromInt submission.id ++ "/grade" ]
-                                                                                        [ text "Grade" ]
+                                                                                    , loadingIfNothing participantsGrades <|
+                                                                                        \gradesData ->
+                                                                                            let
+                                                                                                submissionGradeMaybe =
+                                                                                                    findBy gradesData (\grade -> grade.submission) submission.id
+                                                                                            in
+                                                                                            case submissionGradeMaybe of
+                                                                                                Nothing ->
+                                                                                                    a
+                                                                                                        [ href <| "/users/" ++ fromInt userId ++ "/submissions/" ++ fromInt submission.id ++ "/grade" ]
+                                                                                                        [ text "Grade" ]
+
+                                                                                                Just _ ->
+                                                                                                    span [] [ text "already graded" ]
                                                                                     ]
 
                                                                             Nothing ->
@@ -247,7 +259,7 @@ update msg model =
         SubmissionsMsg (ApiClient.Submissions.ReceivedAssignmentSubmissions result) ->
             case result of
                 Ok submissions ->
-                    ( { model | participantsSubmissions = Just submissions }, Cmd.none )
+                    ( { model | participantsSubmissions = Just submissions }, Cmd.map GradingsMsg <| getAssignmentGrades model.assignmentId )
 
                 -- TODO: Handle
                 _ ->
@@ -283,6 +295,17 @@ update msg model =
                             ( { model | userGrade = Just (Right False) }
                             , Cmd.none
                             )
+
+                -- TODO: Handle
+                _ ->
+                    ( model, Cmd.none )
+
+        GradingsMsg (ApiClient.Grading.ReceivedAssignmentGradings result) ->
+            case result of
+                Ok grades ->
+                    ( { model | participantsGrades = Just grades }
+                    , Cmd.none
+                    )
 
                 -- TODO: Handle
                 _ ->

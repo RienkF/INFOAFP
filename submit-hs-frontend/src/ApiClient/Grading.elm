@@ -16,6 +16,7 @@ type alias Grading =
 
 type Msg
     = ReceivedGradings (Result Http.Error (List Grading))
+    | ReceivedAssignmentGradings (Result Http.Error (List Grading))
     | GradingCreated (Result Http.Error (Maybe Grading))
 
 
@@ -35,6 +36,14 @@ getGradings submissionId =
     Http.get
         { url = "http://localhost:3000/gradings?submissionIds=" ++ fromInt submissionId
         , expect = Http.expectJson ReceivedGradings (list gradingDecoder)
+        }
+
+
+getAssignmentGrades : Int -> Cmd Msg
+getAssignmentGrades assignmentId =
+    Http.get
+        { url = "http://localhost:3000/gradings?assignmentIds=" ++ fromInt assignmentId
+        , expect = Http.expectJson ReceivedAssignmentGradings (list gradingDecoder)
         }
 
 

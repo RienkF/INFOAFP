@@ -127,18 +127,6 @@ update msg model =
                 _ ->
                     ( model, none )
 
-        AttemptsMsg _ ->
-            ( model, none )
-
-        UpdateGrade grade ->
-            ( { model | grade = grade }, none )
-
-        UpdateFeedback feedback ->
-            ( { model | feedback = feedback }, none )
-
-        ChangeGrade ->
-            ( model, Cmd.map GradingMsg (ApiClient.Grading.addGrade model.submissionId model.reviewerId model.grade model.feedback) )
-
         GradingMsg (GradingCreated _) ->
             ( model
             , pushUrl model.navKey <|
@@ -153,6 +141,21 @@ update msg model =
                                 ""
                        )
             )
+
+        GradingMsg _ ->
+            ( model, none )
+
+        AttemptsMsg _ ->
+            ( model, none )
+
+        UpdateGrade grade ->
+            ( { model | grade = grade }, none )
+
+        UpdateFeedback feedback ->
+            ( { model | feedback = feedback }, none )
+
+        ChangeGrade ->
+            ( model, Cmd.map GradingMsg (ApiClient.Grading.addGrade model.submissionId model.reviewerId model.grade model.feedback) )
 
         SubmissionsMsg (ReceivedSubmissions result) ->
             case result of
