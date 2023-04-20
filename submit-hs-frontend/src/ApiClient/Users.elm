@@ -50,8 +50,7 @@ stringToUserType userType =
 
 
 type Msg
-    = SendHttpRequest
-    | DataReceived (Result Http.Error (List User))
+    = DataReceived (Result Http.Error (List User))
     | ClassroomUsersDataReceived (Result Http.Error (List User))
     | UserCreated (Result Http.Error (Maybe User))
 

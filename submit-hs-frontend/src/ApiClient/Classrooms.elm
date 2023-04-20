@@ -19,8 +19,7 @@ type alias ClassroomParticipant =
 
 
 type Msg
-    = SendHttpRequest
-    | DataReceived (Result Http.Error (List Classroom))
+    = DataReceived (Result Http.Error (List Classroom))
     | ClassroomCreated (Result Http.Error (Maybe Classroom))
     | ClassroomParticipantAdded (Result Http.Error (Maybe ClassroomParticipant))
 

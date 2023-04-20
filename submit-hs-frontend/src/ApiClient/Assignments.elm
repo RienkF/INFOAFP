@@ -15,8 +15,7 @@ type alias Assignment =
 
 
 type Msg
-    = SendHttpRequest
-    | DataReceived (Result Http.Error (List Assignment))
+    = DataReceived (Result Http.Error (List Assignment))
     | AssignmentCreated (Result Http.Error (Maybe Assignment))
 
 
