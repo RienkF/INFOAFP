@@ -1,9 +1,9 @@
 module Application.Gradings where
 
+import Database.Beam
 import qualified Database.Gradings
 import Database.Model
 import Servant
-import Database.Beam
 
-getGradings :: Handler [Grading]
-getGradings = liftIO Database.Gradings.getGradings
+getGradings :: Maybe [Int] -> Maybe [Int] -> Handler [Grading]
+getGradings gradingIds submissionIds = liftIO $ Database.Gradings.getGradings gradingIds submissionIds
