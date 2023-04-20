@@ -33,8 +33,8 @@ server =
     :<|> (getClassroomParticipants :<|> addClassroomParticipant)
     :<|> (getAssignments :<|> addAssignment)
     :<|> (getSubmissions :<|> addSubmission)
-    :<|> getAttempts
-    :<|> getGradings
+    :<|> (getAttempts :<|> addAttempt)
+    :<|> (getGradings :<|> addGrading)
     :<|> serveDirectoryFileServer "static/"
 
 application :: Application

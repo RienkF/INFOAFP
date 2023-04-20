@@ -6,7 +6,9 @@
 module Api.Spec where
 
 import Api.Types.AssignmentTypes (AddAssignmentBody)
+import Api.Types.AttemptTypes
 import Api.Types.ClassroomTypes
+import Api.Types.GradingTypes
 import Api.Types.SubmissionTypes (AddSubmissionBody)
 import Api.Types.UserTypes
 import Data.Aeson
@@ -37,8 +39,14 @@ type Spec =
       :> ( QueryParam "submissionIds" [Int] :> QueryParam "userIds" [Int] :> QueryParam "assignmentIds" [Int] :> Get '[JSON] [Submission]
              :<|> "add" :> ReqBody '[JSON] AddSubmissionBody :> Post '[JSON] (Maybe Submission)
          )
-    :<|> "attempts" :> QueryParam "attemptIds" [Int] :> QueryParam "submissionIds" [Int] :> Get '[JSON] [Attempt]
-    :<|> "gradings" :> QueryParam "gradingIds" [Int] :> QueryParam "submissionIds" [Int] :> Get '[JSON] [Grading]
+    :<|> "attempts"
+      :> ( QueryParam "attemptIds" [Int] :> QueryParam "submissionIds" [Int] :> Get '[JSON] [Attempt]
+             :<|> "add" :> ReqBody '[JSON] AddAttemptBody :> Post '[JSON] (Maybe Attempt)
+         )
+    :<|> "gradings"
+      :> ( QueryParam "gradingIds" [Int] :> QueryParam "submissionIds" [Int] :> Get '[JSON] [Grading]
+             :<|> "add" :> ReqBody '[JSON] AddGradingBody :> Post '[JSON] (Maybe Grading)
+         )
     :<|> Raw -- This final raw is just so we can serve the index file of the frontend
 
 instance ToJSON UserType where
