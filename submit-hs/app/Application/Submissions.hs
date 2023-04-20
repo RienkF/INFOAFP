@@ -17,11 +17,23 @@ getSubmissions submissionIds userIds assignmentIds = liftIO $ Database.Submissio
 
 addSubmission :: AddSubmissionBody -> Handler (Maybe Submission)
 addSubmission body = do
-  users <- Database.Users.getUsers (Just [userId body]) Nothing
   assignment <- liftIO $ Database.Assignments.getAssignments (Just [assignmentId body]) Nothing
 
-  case users of
-    [user] -> case assignment of
-      [assignment] -> liftIO $ Database.Submission.addSubmission user assignment
-      _ -> return Nothing
+  case assignment of
+    [assignment] -> do
+      -- User should be in the same classroom as the assignment
+      let (ClassroomId classroomId) = _assignmentClassroom assignment
+      users <- Database.Users.getUsers (Just [userId body]) (Just [fromIntegral classroomId])
+
+      case users of
+        [user] -> do
+          submissions <-
+            liftIO $
+              Database.Submission.getSubmissions Nothing (Just [fromIntegral $ _userId user]) (Just [fromIntegral $ _assignmentId assignment])
+
+          -- Only create the submission if the user does not yet have a submission for this assignment
+          case submissions of
+            [] -> liftIO $ Database.Submission.addSubmission user assignment
+            _ -> return Nothing
+        _ -> return Nothing
     _ -> return Nothing
