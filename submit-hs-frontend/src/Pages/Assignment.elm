@@ -73,7 +73,7 @@ view { userId, userData, assignmentData, participantsData, participantsSubmissio
 
                                                     -- If there is no submission, place a button to add one
                                                     Right _ ->
-                                                        button [] [ text "Add submission" ]
+                                                        button [ onClick AddSubmissionClicked ] [ text "Add submission" ]
                                         ]
 
                                 _ ->

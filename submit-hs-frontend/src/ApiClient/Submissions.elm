@@ -45,20 +45,18 @@ getAssignmentSubmissions assignmentId =
         }
 
 
+createSubmission : Int -> Int -> Cmd Msg
+createSubmission userId assignmentId =
+    Http.post
+        { body = jsonBody (encodeSubmissionBody userId assignmentId)
+        , expect = Http.expectJson SubmissionCreated (maybe submssionDecoder)
+        , url = "http://localhost:3000/submissions/add"
+        }
 
--- createAssignment : String -> String -> String -> Float -> Int -> Cmd Msg
--- createAssignment description startDate deadline weight classroomId =
---     Http.post
---         { body = jsonBody (encodeAssignmentBody description startDate deadline weight classroomId)
---         , expect = Http.expectJson AssignmentCreated (maybe assignmentDecoder)
---         , url = "http://localhost:3000/assignments/add"
---         }
--- encodeAssignmentBody : String -> String -> String -> Float -> Int -> Value
--- encodeAssignmentBody description startDate deadline weight classroomId =
---     object
---         [ ( "assignmentDescription", Encode.string description )
---         , ( "assignmentStartDate", Encode.string startDate )
---         , ( "assignmentDeadline", Encode.string deadline )
---         , ( "assignmentWeight", Encode.float weight )
---         , ( "assignmentClassroom", Encode.int classroomId )
---         ]
+
+encodeSubmissionBody : Int -> Int -> Value
+encodeSubmissionBody userId assignmentId =
+    object
+        [ ( "userId", Encode.int userId )
+        , ( "assignmentId", Encode.int assignmentId )
+        ]
