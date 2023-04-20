@@ -1,17 +1,15 @@
 module Pages.AddSubmission exposing (..)
 
-import ApiClient.Assignments exposing (Msg(..), createAssignment)
 import ApiClient.Attempts exposing (Msg(..), submitAttempt)
-import ApiClient.Submissions exposing (Msg(..), Submission, createSubmission, getUserSubmission)
+import ApiClient.Submissions exposing (Msg(..), createSubmission, getUserSubmission)
 import Browser exposing (Document)
 import Browser.Navigation exposing (Key, pushUrl)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
-import Pages.Classrooms exposing (Msg(..))
 import Platform.Cmd exposing (none)
-import String exposing (fromFloat, fromInt)
-import Util exposing (Either(..), loadingIfNothing)
+import String exposing (fromInt)
+import Util exposing (Either(..))
 
 
 
@@ -41,7 +39,7 @@ view { fileData } =
     , body =
         [ h1 [] [ text "Add a submission" ]
         , h2 [] [ text "Input a the file content of the attempt" ]
-        , input
+        , textarea
             [ value fileData, onInput UpdateFile ]
             []
         , br [] []

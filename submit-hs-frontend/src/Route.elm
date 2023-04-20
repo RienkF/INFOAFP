@@ -16,6 +16,7 @@ type Route
     | Grade Int Int
     | AddSubmission Int Int
     | AddAttempt Int Int
+    | Attempt Int Int
 
 
 parser : Parser (Route -> a) a
@@ -32,6 +33,7 @@ parser =
         , Parser.map Grade (s "users" </> int </> s "submissions" </> int </> s "grade")
         , Parser.map AddSubmission (s "users" </> int </> s "assignments" </> int </> s "addSubmission")
         , Parser.map AddAttempt (s "users" </> int </> s "assignments" </> int </> s "addAttempt")
+        , Parser.map Attempt (s "users" </> int </> s "attempts" </> int)
         ]
 
 

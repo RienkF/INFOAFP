@@ -15,7 +15,8 @@ type alias Attempt =
 
 
 type Msg
-    = ReceivedSubmissionAttempts (Result Http.Error (List Attempt))
+    = ReceivedAttempt (Result Http.Error (List Attempt))
+    | ReceivedSubmissionAttempts (Result Http.Error (List Attempt))
     | AttemptCreated (Result Http.Error (Maybe Attempt))
 
 
@@ -30,6 +31,14 @@ attemptDecoder =
         (field "_attemptFile" Decode.string)
         (field "_attemptTimestamp" Decode.string)
         (field "_attemptSubmission" Decode.int)
+
+
+getAttempt : Int -> Cmd Msg
+getAttempt attemptId =
+    Http.get
+        { url = "http://localhost:3000/attempts?attemptIds=" ++ fromInt attemptId
+        , expect = Http.expectJson ReceivedAttempt (list attemptDecoder)
+        }
 
 
 getSubmissionAttempts : Int -> Cmd Msg
