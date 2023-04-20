@@ -50,3 +50,9 @@ addAssignment startDate deadline description weight classroom = do
           [assignment] -> Just assignment
           _ -> Nothing
       )
+
+deleteAssignment :: Int -> IO ()
+deleteAssignment assignmentId = do
+  conn <- databaseConnection
+  runBeamSqlite conn $ runDelete $ delete (assignments submitDb)
+        (\c -> _assignmentId c ==. fromIntegral assignmentId)
