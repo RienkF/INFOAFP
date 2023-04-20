@@ -13,6 +13,7 @@ type Route
     | AddParticipant Int Int
     | AddAssignment Int Int
     | Assignment Int Int
+    | AddSubmission Int Int
     | AddAttempt Int Int
 
 
@@ -27,6 +28,7 @@ parser =
         , Parser.map AddParticipant (s "users" </> int </> s "classrooms" </> int </> s "addParticipant")
         , Parser.map AddAssignment (s "users" </> int </> s "classrooms" </> int </> s "assignments" </> s "add")
         , Parser.map Assignment (s "users" </> int </> s "assignments" </> int)
+        , Parser.map AddSubmission (s "users" </> int </> s "assignments" </> int </> s "addSubmission")
         , Parser.map AddAttempt (s "users" </> int </> s "assignments" </> int </> s "addAttempt")
         ]
 

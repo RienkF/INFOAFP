@@ -11,6 +11,7 @@ import Pages.AddAssignment
 import Pages.AddAttempt
 import Pages.AddClassroom
 import Pages.AddParticipant
+import Pages.AddSubmission
 import Pages.Assignment
 import Pages.Classroom
 import Pages.Classrooms exposing (Model, Msg)
@@ -35,6 +36,7 @@ type Model
     | AddParticipantModel Pages.AddParticipant.Model
     | AddAssignmentModel Pages.AddAssignment.Model
     | AssignmentModel Pages.Assignment.Model
+    | AddSubmissionModel Pages.AddSubmission.Model
     | AddAttemptModel Pages.AddAttempt.Model
 
 
@@ -82,6 +84,9 @@ view model =
         AssignmentModel assignmentModel ->
             useView (Pages.Assignment.view assignmentModel) AssignmentMsg
 
+        AddSubmissionModel addSubmissionModel ->
+            useView (Pages.AddSubmission.view addSubmissionModel) AddSubmissionMsg
+
         AddAttemptModel addAttemptModel ->
             useView (Pages.AddAttempt.view addAttemptModel) AddAttemptMsg
 
@@ -106,6 +111,7 @@ type Msg
     | AddParticipantMsg Pages.AddParticipant.Msg
     | AddAssignmentMsg Pages.AddAssignment.Msg
     | AssignmentMsg Pages.Assignment.Msg
+    | AddSubmissionMsg Pages.AddSubmission.Msg
     | AddAttemptMsg Pages.AddAttempt.Msg
     | NoMsg
 
@@ -148,6 +154,10 @@ changeRouteTo maybeRoute model =
         Just (Route.Assignment userId assignmentId) ->
             Pages.Assignment.init (getKey model) userId assignmentId
                 |> updateWith AssignmentModel AssignmentMsg model
+
+        Just (Route.AddSubmission userId assignmentId) ->
+            Pages.AddSubmission.init (getKey model) userId assignmentId
+                |> updateWith AddSubmissionModel AddSubmissionMsg model
 
         Just (Route.AddAttempt userId assignmentId) ->
             Pages.AddAttempt.init (getKey model) userId assignmentId
@@ -204,6 +214,10 @@ update msg model =
             Pages.Assignment.update assignmentMsg assignmentModel
                 |> updateWith AssignmentModel AssignmentMsg model
 
+        ( AddSubmissionMsg addSubmissionMsg, AddSubmissionModel addSubmissionModel ) ->
+            Pages.AddSubmission.update addSubmissionMsg addSubmissionModel
+                |> updateWith AddSubmissionModel AddSubmissionMsg model
+
         ( AddAttemptMsg addAttemptMsg, AddAttemptModel addAttemptModel ) ->
             Pages.AddAttempt.update addAttemptMsg addAttemptModel
                 |> updateWith AddAttemptModel AddAttemptMsg model
@@ -242,6 +256,9 @@ getKey model =
 
         AssignmentModel assignmentModel ->
             assignmentModel.navKey
+
+        AddSubmissionModel addSubmissionModel ->
+            addSubmissionModel.navKey
 
         AddAttemptModel addAttemptModel ->
             addAttemptModel.navKey
