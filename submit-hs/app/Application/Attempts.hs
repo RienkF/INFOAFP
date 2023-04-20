@@ -7,8 +7,8 @@ import Database.Model
 import qualified Database.Submissions
 import Servant
 
-getAttempts :: Maybe [Int] -> Handler [Attempt]
-getAttempts idFilter = liftIO $ Database.Attempts.getAttempts idFilter
+getAttempts :: Maybe [Int] -> Maybe [Int] -> Handler [Attempt]
+getAttempts attemptIds submissionIds = liftIO $ Database.Attempts.getAttempts attemptIds submissionIds
 
 addAttempt :: AddAttemptBody -> Handler (Maybe Attempt)
 addAttempt body = do

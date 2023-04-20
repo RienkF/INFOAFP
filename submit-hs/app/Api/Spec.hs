@@ -37,7 +37,7 @@ type Spec =
       :> ( QueryParam "submissionIds" [Int] :> QueryParam "userIds" [Int] :> QueryParam "assignmentIds" [Int] :> Get '[JSON] [Submission]
              :<|> "add" :> ReqBody '[JSON] AddSubmissionBody :> Post '[JSON] (Maybe Submission)
          )
-    :<|> "attempts" :> QueryParam "attemptIds" [Int] :> Get '[JSON] [Attempt]
+    :<|> "attempts" :> QueryParam "attemptIds" [Int] :> QueryParam "submissionIds" [Int] :> Get '[JSON] [Attempt]
     :<|> "gradings" :> Get '[JSON] [Grading]
     :<|> Raw -- This final raw is just so we can serve the index file of the frontend
 
