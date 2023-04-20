@@ -16,6 +16,7 @@ type alias Attempt =
 
 type Msg
     = ReceivedSubmissionAttempts (Result Http.Error (List Attempt))
+    | AttemptCreated (Result Http.Error (Maybe Attempt))
 
 
 
@@ -39,20 +40,18 @@ getSubmissionAttempts submissionId =
         }
 
 
+submitAttempt : Int -> String -> Cmd Msg
+submitAttempt submissionId fileContent =
+    Http.post
+        { body = jsonBody (encodeAttemptBody submissionId fileContent)
+        , expect = Http.expectJson AttemptCreated (maybe attemptDecoder)
+        , url = "http://localhost:3000/attempts/add"
+        }
 
--- createAssignment : String -> String -> String -> Float -> Int -> Cmd Msg
--- createAssignment description startDate deadline weight classroomId =
---     Http.post
---         { body = jsonBody (encodeAssignmentBody description startDate deadline weight classroomId)
---         , expect = Http.expectJson AssignmentCreated (maybe assignmentDecoder)
---         , url = "http://localhost:3000/assignments/add"
---         }
--- encodeAssignmentBody : String -> String -> String -> Float -> Int -> Value
--- encodeAssignmentBody description startDate deadline weight classroomId =
---     object
---         [ ( "assignmentDescription", Encode.string description )
---         , ( "assignmentStartDate", Encode.string startDate )
---         , ( "assignmentDeadline", Encode.string deadline )
---         , ( "assignmentWeight", Encode.float weight )
---         , ( "assignmentClassroom", Encode.int classroomId )
---         ]
+
+encodeAttemptBody : Int -> String -> Value
+encodeAttemptBody submissionId fileContent =
+    object
+        [ ( "submissionId", Encode.int submissionId )
+        , ( "file", Encode.string fileContent )
+        ]

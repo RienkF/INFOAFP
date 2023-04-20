@@ -222,6 +222,9 @@ update msg model =
                 _ ->
                     ( model, Cmd.none )
 
+        AttemptsMsg _ ->
+            ( model, Cmd.none )
+
         AddAttemptClicked ->
             ( model, pushUrl model.navKey <| "/users/" ++ fromInt model.userId ++ "/assignments/" ++ fromInt model.assignmentId ++ "/addAttempt" )
 
