@@ -22,6 +22,7 @@ type Spec =
   "users"
     :> ( QueryParam "userIds" [Int] :> QueryParam "classroomIds" [Int] :> Get '[JSON] [User]
            :<|> "add" :> ReqBody '[JSON] AddUserBody :> Post '[JSON] (Maybe User)
+           :<|> "del" :> ReqBody '[JSON] DelUserBody :> Delete '[JSON] ()
        )
     :<|> "classrooms"
       :> ( QueryParam "classroomIds" [Int] :> QueryParam "userIds" [Int] :> Get '[JSON] [Classroom]

@@ -13,3 +13,8 @@ getUsers userIds classroomIds = liftIO $ Database.Users.getUsers userIds classro
 addUser :: AddUserBody -> Handler (Maybe User)
 addUser body = do
   liftIO $ Database.Users.addUser (userName body) (userType body)
+
+delUserById :: DelUserBody -> Handler ()
+delUserById body = do
+  liftIO $ Database.Users.delUserById (userId body)
+

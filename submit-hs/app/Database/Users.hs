@@ -48,3 +48,12 @@ addUser userName userType = do
           [user] -> Just user
           _ -> Nothing
       )
+
+delUserById :: Int -> IO ()
+delUserById userId = do
+  conn <- databaseConnection
+  runBeamSqlite conn $ do
+    runDelete $
+      delete (users submitDb)
+        (\u -> _userId u ==. fromIntegral userId)
+

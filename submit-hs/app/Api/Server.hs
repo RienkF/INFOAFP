@@ -27,7 +27,7 @@ api = Proxy
 
 server :: Server Api.Spec.Spec
 server =
-  ( getUsers :<|> addUser
+  ( getUsers :<|> addUser :<|> delUserById
   )
     :<|> (getClassrooms :<|> addClassroom)
     :<|> (getClassroomParticipants :<|> addClassroomParticipant)
