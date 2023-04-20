@@ -44,6 +44,13 @@ getAssignmentSubmissions assignmentId =
         , expect = Http.expectJson ReceivedAssignmentSubmissions (list submssionDecoder)
         }
 
+getSubmission : Int -> Cmd Msg
+getSubmission submissionsId = 
+    Http.get
+        { url = "http://localhost:3000/submissions?submissionId=" ++ fromInt submissionsId
+        , expect = Http.expectJson ReceivedSubmissions (list submssionDecoder)
+        }
+
 
 createSubmission : Int -> Int -> Cmd Msg
 createSubmission userId assignmentId =

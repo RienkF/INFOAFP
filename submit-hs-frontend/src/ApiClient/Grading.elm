@@ -42,7 +42,7 @@ addGrade submissionId reviewerId grade feedback =
     Http.post
         { body = jsonBody (encodeGradeBody submissionId reviewerId grade feedback)
         , expect = Http.expectJson GradingCreated (maybe gradingDecoder)
-        , url = "http://localhost:3000/classrooms/add"
+        , url = "http://localhost:3000/gradings/add"
         }
 
 encodeGradeBody : Int -> Int -> String -> String -> Value
@@ -50,6 +50,6 @@ encodeGradeBody submissionId reviewerid grade feedback =
     object
         [ ( "submissionId", Encode.int submissionId )
         , ( "reviewerId", Encode.int reviewerid )
-        , ( "grade", Encode.string grade )
+        , ( "grade", Encode.float (String.toFloat grade |> Maybe.withDefault 0) )
         , ( "feedback", Encode.string feedback )
         ]

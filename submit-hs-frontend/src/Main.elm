@@ -23,6 +23,7 @@ import Route exposing (Route(..))
 import Url exposing (Url)
 import Pages.Grade
 import Pages.Grade exposing (Msg(..))
+import ApiClient.Grading exposing (Grading)
 
 
 
@@ -92,6 +93,9 @@ view model =
 
         AddAttemptModel addAttemptModel ->
             useView (Pages.AddAttempt.view addAttemptModel) AddAttemptMsg
+        
+        GradingModel gradeModel ->
+            useView (Pages.Grade.view gradeModel) GradingMsg
 
 
 useView : Document a -> (a -> Msg) -> Document Msg
@@ -116,6 +120,7 @@ type Msg
     | AssignmentMsg Pages.Assignment.Msg
     | AddSubmissionMsg Pages.AddSubmission.Msg
     | AddAttemptMsg Pages.AddAttempt.Msg
+    | GradingMsg Pages.Grade.Msg
     | NoMsg
 
 
@@ -228,6 +233,10 @@ update msg model =
         ( AddAttemptMsg addAttemptMsg, AddAttemptModel addAttemptModel ) ->
             Pages.AddAttempt.update addAttemptMsg addAttemptModel
                 |> updateWith AddAttemptModel AddAttemptMsg model
+        
+        ( GradingMsg gradingMsg, GradingModel gradingModel ) ->
+            Pages.Grade.update gradingMsg gradingModel
+                |> updateWith GradingModel GradingMsg model
 
         ( NoMsg, _ ) ->
             ( model, Platform.Cmd.none )
@@ -269,6 +278,9 @@ getKey model =
 
         AddAttemptModel addAttemptModel ->
             addAttemptModel.navKey
+        
+        GradingModel gradingModel ->
+            gradingModel.navKey
 
 
 updateWith : (subModel -> Model) -> (subMsg -> Msg) -> Model -> ( subModel, Cmd subMsg ) -> ( Model, Cmd Msg )
