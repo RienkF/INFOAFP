@@ -30,6 +30,7 @@ executable submit-hs
         Api.Types.SubmissionTypes,
         Api.Types.AssignmentTypes,
         Api.Types.AttemptTypes,
+        Api.Types.GradingTypes,
         Application.Users,
         Application.Classrooms,
         Application.Assignments,

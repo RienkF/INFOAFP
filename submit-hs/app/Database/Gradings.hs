@@ -4,6 +4,8 @@ import Database.Beam
 import Database.Beam.Sqlite
 import Database.Db (SubmitDb (gradings, submissions), databaseConnection, submitDb)
 import Database.Model
+import Servant
+import Data.Text
 
 getGradings :: Maybe [Int] -> Maybe [Int] -> IO [Grading]
 getGradings gradingIds submissionIds = do
@@ -28,3 +30,19 @@ getGradings gradingIds submissionIds = do
         Nothing -> guard_ $ val_ True
 
       return gradings
+    runSelectReturningList $ select (all_ (gradings submitDb))
+
+addGrading :: Submission -> Double -> User -> Text -> IO (Maybe Grading)
+addGrading submission grade reviewer feedback = do
+  conn <- databaseConnection
+  runBeamSqlite conn $ do
+    result <- 
+      runInsertReturningList $
+        insert ( gradings submitDb ) $
+          insertExpressions [ Grading default_ (val_ $ pk submission) (val_ grade) (val_ $ pk reviewer) currentTimestamp_ (val_ feedback) ]
+    -- This has to  return a single Grading
+    return 
+      ( case result of
+          [grading] -> Just grading
+          _ -> Nothing
+      )
