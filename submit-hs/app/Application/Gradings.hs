@@ -8,8 +8,10 @@ import Database.Submissions
 import Database.Users
 import Servant
 
-getGradings :: Maybe [Int] -> Maybe [Int] -> Handler [Grading]
-getGradings gradingIds submissionIds = liftIO $ Database.Gradings.getGradings gradingIds submissionIds
+getGradings :: Maybe [Int] -> Maybe [Int] -> Maybe [Int] -> Handler [Grading]
+getGradings gradingIds submissionIds assignmentIds =
+  liftIO $
+    Database.Gradings.getGradings gradingIds submissionIds assignmentIds
 
 addGrading :: AddGradingBody -> Handler (Maybe Grading)
 addGrading body = do

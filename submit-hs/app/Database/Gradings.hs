@@ -3,12 +3,12 @@ module Database.Gradings where
 import Data.Text
 import Database.Beam
 import Database.Beam.Sqlite
-import Database.Db (SubmitDb (gradings, submissions), databaseConnection, submitDb)
+import Database.Db (SubmitDb (assignments, gradings, submissions), databaseConnection, submitDb)
 import Database.Model
 import Servant
 
-getGradings :: Maybe [Int] -> Maybe [Int] -> IO [Grading]
-getGradings gradingIds submissionIds = do
+getGradings :: Maybe [Int] -> Maybe [Int] -> Maybe [Int] -> IO [Grading]
+getGradings gradingIds submissionIds assignmentIds = do
   conn <- databaseConnection
   runBeamSqlite conn $ do
     runSelectReturningList $ select $ do
@@ -27,6 +27,19 @@ getGradings gradingIds submissionIds = do
               `in_` Prelude.map fromIntegral filter
               &&. _gradingSubmission gradings
               ==. primaryKey submissions
+        Nothing -> guard_ $ val_ True
+
+      case assignmentIds of
+        Just filter -> do
+          assignments <- all_ (assignments submitDb)
+          submissions <- all_ (submissions submitDb)
+          guard_ $
+            _assignmentId assignments
+              `in_` Prelude.map fromIntegral filter
+              &&. _submissionAssignment submissions
+              ==. primaryKey assignments
+              &&. primaryKey submissions
+              ==. _gradingSubmission gradings
         Nothing -> guard_ $ val_ True
 
       return gradings

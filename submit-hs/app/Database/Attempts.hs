@@ -12,7 +12,9 @@ getAttempts attemptIds submissionIds = do
   runBeamSqlite conn $ do
     runSelectReturningList $
       select $ do
-        attempts <- all_ (attempts submitDb)
+        attempts <- 
+          orderBy_ (desc_ . _attemptTimestamp) $
+          all_ (attempts submitDb)
 
         guard_ $
           case attemptIds of

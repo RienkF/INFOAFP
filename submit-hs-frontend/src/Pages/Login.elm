@@ -82,7 +82,7 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        UsersMsg (DataReceived result) ->
+        UsersMsg (UsersDataReceived result) ->
             case result of
                 Ok users ->
                     ( { model | userOptions = Just users }

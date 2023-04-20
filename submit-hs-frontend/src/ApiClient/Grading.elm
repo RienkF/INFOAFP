@@ -11,7 +11,7 @@ type alias Gradings =
 
 
 type alias Grading =
-    { id : Int, submission: Int, grade : Float, user: Int, timestamp: String, feedback : String}
+    { id : Int, submission : Int, grade : Float, user : Int, timestamp : String, feedback : String }
 
 
 type Msg
@@ -37,6 +37,7 @@ getGradings submissionId =
         , expect = Http.expectJson ReceivedGradings (list gradingDecoder)
         }
 
+
 addGrade : Int -> Int -> String -> String -> Cmd Msg
 addGrade submissionId reviewerId grade feedback =
     Http.post
@@ -44,6 +45,7 @@ addGrade submissionId reviewerId grade feedback =
         , expect = Http.expectJson GradingCreated (maybe gradingDecoder)
         , url = "http://localhost:3000/gradings/add"
         }
+
 
 encodeGradeBody : Int -> Int -> String -> String -> Value
 encodeGradeBody submissionId reviewerid grade feedback =

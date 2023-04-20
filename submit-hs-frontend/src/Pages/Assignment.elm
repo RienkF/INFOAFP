@@ -2,15 +2,16 @@ module Pages.Assignment exposing (..)
 
 import ApiClient.Assignments exposing (Assignment, getAssignment)
 import ApiClient.Attempts exposing (Attempts, getSubmissionAttempts)
+import ApiClient.Grading exposing (Grading, getGradings)
 import ApiClient.Submissions exposing (Submission, Submissions, getAssignmentSubmissions, getUserSubmission)
-import ApiClient.Users exposing (User, UserType(..), Users, getClassroomUsers, getUser)
+import ApiClient.Users exposing (User, UserType(..), Users, getClassroomUsers, getReviewer, getUser)
 import Browser exposing (Document)
 import Browser.Navigation exposing (Key, pushUrl)
 import Html exposing (a, button, div, h1, h2, h3, li, p, span, text, ul)
 import Html.Attributes exposing (href)
 import Html.Events exposing (onClick)
 import List exposing (filter, map, reverse, sortBy)
-import String exposing (fromInt)
+import String exposing (fromFloat, fromInt)
 import Util exposing (Either(..), findBy, loadingIfNothing)
 
 
@@ -20,7 +21,7 @@ import Util exposing (Either(..), findBy, loadingIfNothing)
 
 init : Key -> Int -> Int -> ( Model, Cmd Msg )
 init navKey userId assignmentId =
-    ( Model navKey userId Nothing assignmentId Nothing Nothing Nothing Nothing Nothing Nothing
+    ( Model navKey userId Nothing assignmentId Nothing Nothing Nothing Nothing Nothing Nothing Nothing
     , Cmd.batch
         [ Cmd.map UsersMsg (getUser userId)
         , Cmd.map AssignmentsMsg (getAssignment assignmentId)
@@ -38,7 +39,8 @@ type alias Model =
     , participantsSubmissions : Maybe Submissions
     , userSubmission : Maybe (Either Submission Bool)
     , userAttempts : Maybe Attempts
-    , userGrade : Maybe Bool
+    , userGrade : Maybe (Either Grading Bool)
+    , reviewer : Maybe User
     }
 
 
@@ -47,7 +49,7 @@ type alias Model =
 
 
 view : Model -> Document Msg
-view { userId, userData, assignmentData, participantsData, participantsSubmissions, userSubmission, userAttempts, userGrade } =
+view { userId, userData, assignmentData, participantsData, participantsSubmissions, userSubmission, userAttempts, userGrade, reviewer } =
     { title = "Assignment"
     , body =
         [ loadingIfNothing assignmentData <|
@@ -65,11 +67,15 @@ view { userId, userData, assignmentData, participantsData, participantsSubmissio
                                         , loadingIfNothing userGrade <|
                                             \grade ->
                                                 case grade of
-                                                    False ->
-                                                        p [] [ text "No grade yet" ]
+                                                    Left gradeVal ->
+                                                        div []
+                                                            [ p [] [ text <| "Score: " ++ fromFloat gradeVal.grade ]
+                                                            , p [] [ text <| "Feedback: " ++ gradeVal.feedback ]
+                                                            , p [] [ text "Reviewer: ", loadingIfNothing reviewer <| \reviewerVal -> text <| reviewerVal.userName ]
+                                                            ]
 
-                                                    True ->
-                                                        p [] [ text "You have a grade" ]
+                                                    Right _ ->
+                                                        p [] [ text "No grade yet" ]
                                         , h3 [] [ text "Attempts:" ]
                                         , loadingIfNothing userSubmission <|
                                             \submission ->
@@ -149,7 +155,7 @@ view { userId, userData, assignmentData, participantsData, participantsSubmissio
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        UsersMsg (ApiClient.Users.DataReceived result) ->
+        UsersMsg (ApiClient.Users.UserDataReceived result) ->
             case result of
                 Ok [ user ] ->
                     ( { model | userData = Just user }
@@ -175,6 +181,17 @@ update msg model =
                 Ok participants ->
                     ( { model | participantsData = Just participants }
                     , Cmd.map SubmissionsMsg <| getAssignmentSubmissions model.assignmentId
+                    )
+
+                -- TODO: Handle
+                _ ->
+                    ( model, Cmd.none )
+
+        UsersMsg (ApiClient.Users.ReviewerDataReceived result) ->
+            case result of
+                Ok [ reviewer ] ->
+                    ( { model | reviewer = Just reviewer }
+                    , Cmd.none
                     )
 
                 -- TODO: Handle
@@ -214,11 +231,14 @@ update msg model =
                     case submissions of
                         [ submission ] ->
                             ( { model | userSubmission = Just <| Left submission }
-                            , Cmd.map AttemptsMsg <| getSubmissionAttempts submission.id
+                            , Cmd.batch
+                                [ Cmd.map AttemptsMsg <| getSubmissionAttempts submission.id
+                                , Cmd.map GradingsMsg <| getGradings submission.id
+                                ]
                             )
 
                         _ ->
-                            ( { model | userSubmission = Just <| Right False }, Cmd.none )
+                            ( { model | userSubmission = Just <| Right False, userGrade = Just <| Right False }, Cmd.none )
 
                 -- TODO: Handle
                 _ ->
@@ -250,6 +270,27 @@ update msg model =
         AttemptsMsg _ ->
             ( model, Cmd.none )
 
+        GradingsMsg (ApiClient.Grading.ReceivedGradings result) ->
+            case result of
+                Ok grades ->
+                    case grades of
+                        [ grade ] ->
+                            ( { model | userGrade = Just (Left grade) }
+                            , Cmd.map UsersMsg <| getReviewer grade.user
+                            )
+
+                        _ ->
+                            ( { model | userGrade = Just (Right False) }
+                            , Cmd.none
+                            )
+
+                -- TODO: Handle
+                _ ->
+                    ( model, Cmd.none )
+
+        GradingsMsg _ ->
+            ( model, Cmd.none )
+
         AddAttemptClicked ->
             ( model, pushUrl model.navKey <| "/users/" ++ fromInt model.userId ++ "/assignments/" ++ fromInt model.assignmentId ++ "/addAttempt" )
 
@@ -264,3 +305,4 @@ type Msg
     | AssignmentsMsg ApiClient.Assignments.Msg
     | SubmissionsMsg ApiClient.Submissions.Msg
     | AttemptsMsg ApiClient.Attempts.Msg
+    | GradingsMsg ApiClient.Grading.Msg
