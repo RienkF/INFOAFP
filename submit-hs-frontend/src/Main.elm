@@ -8,6 +8,7 @@ import Browser.Navigation exposing (Key, load, pushUrl)
 import Html exposing (div)
 import Html.Attributes exposing (style)
 import Pages.AddAssignment
+import Pages.AddAttempt
 import Pages.AddClassroom
 import Pages.AddParticipant
 import Pages.Assignment
@@ -35,6 +36,7 @@ type Model
     | AddParticipantModel Pages.AddParticipant.Model
     | AddAssignmentModel Pages.AddAssignment.Model
     | AssignmentModel Pages.Assignment.Model
+    | AddAttemptModel Pages.AddAttempt.Model
 
 
 init : () -> Url.Url -> Key -> ( Model, Cmd Msg )
@@ -81,6 +83,9 @@ view model =
         AssignmentModel assignmentModel ->
             useView (Pages.Assignment.view assignmentModel) AssignmentMsg
 
+        AddAttemptModel addAttemptModel ->
+            useView (Pages.AddAttempt.view addAttemptModel) AddAttemptMsg
+
 
 useView : Document a -> (a -> Msg) -> Document Msg
 useView result mapMsg =
@@ -102,6 +107,7 @@ type Msg
     | AddParticipantMsg Pages.AddParticipant.Msg
     | AddAssignmentMsg Pages.AddAssignment.Msg
     | AssignmentMsg Pages.Assignment.Msg
+    | AddAttemptMsg Pages.AddAttempt.Msg
     | NoMsg
 
 
@@ -147,6 +153,10 @@ changeRouteTo maybeRoute model =
         Just (Route.Grade userId submissionId) ->
             Pages.Grade.init (getKey model) userId submissionId
                 |> updateWith SubmissionM
+
+        Just (Route.AddAttempt userId assignmentId) ->
+            Pages.AddAttempt.init (getKey model) userId assignmentId
+                |> updateWith AddAttemptModel AddAttemptMsg model
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -199,6 +209,10 @@ update msg model =
             Pages.Assignment.update assignmentMsg assignmentModel
                 |> updateWith AssignmentModel AssignmentMsg model
 
+        ( AddAttemptMsg addAttemptMsg, AddAttemptModel addAttemptModel ) ->
+            Pages.AddAttempt.update addAttemptMsg addAttemptModel
+                |> updateWith AddAttemptModel AddAttemptMsg model
+
         ( NoMsg, _ ) ->
             ( model, Platform.Cmd.none )
 
@@ -233,6 +247,9 @@ getKey model =
 
         AssignmentModel assignmentModel ->
             assignmentModel.navKey
+
+        AddAttemptModel addAttemptModel ->
+            addAttemptModel.navKey
 
 
 updateWith : (subModel -> Model) -> (subMsg -> Msg) -> Model -> ( subModel, Cmd subMsg ) -> ( Model, Cmd Msg )

@@ -1,13 +1,12 @@
 module Application.Gradings where
 
+import Api.Types.GradingTypes
 import Database.Beam
 import qualified Database.Gradings
 import Database.Model
-import Servant
-import Database.Beam
-import Api.Types.GradingTypes
-import Database.Users
 import Database.Submissions
+import Database.Users
+import Servant
 
 getGradings :: Maybe [Int] -> Maybe [Int] -> Handler [Grading]
 getGradings gradingIds submissionIds = liftIO $ Database.Gradings.getGradings gradingIds submissionIds
@@ -18,11 +17,11 @@ addGrading body = do
 
   -- there should be only a single submission associated
   case submissions of
-    [ submission ] -> do
+    [submission] -> do
       reviewers <- liftIO $ getUsers (Just [reviewerId body]) Nothing
       -- there should be only a single reviewer associated
       case reviewers of
-        [ reviewer ] -> undefined
+        [reviewer] ->
+          liftIO $ Database.Gradings.addGrading submission (grade body) reviewer (feedback body)
         _ -> return Nothing
     _ -> return Nothing
-
