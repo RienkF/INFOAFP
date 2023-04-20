@@ -5,10 +5,12 @@ import ApiClient.Grading exposing (Msg(..))
 import ApiClient.Submissions exposing (Msg(..), Submission, getSubmission)
 import ApiClient.Users exposing (Msg(..), UserType(..))
 import Browser exposing (Document)
-import Browser.Navigation exposing (Key, pushUrl)
+import Browser.Navigation exposing (Key, pushUrl, reload)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
+import Json.Decode exposing (at)
+import List exposing (isEmpty)
 import Platform.Cmd exposing (none)
 import String exposing (fromInt)
 import Util exposing (Either(..), loadingIfNothing)
@@ -26,15 +28,17 @@ type alias Model =
     , grade : String
     , feedback : String
     , attempt : Maybe (Either Attempt Bool)
+    , alreadyGraded : Maybe Bool
     }
 
 
 init : Key -> Int -> Int -> ( Model, Cmd Msg )
 init navKey reviewerId submissionId =
-    ( Model navKey submissionId Nothing reviewerId "0.0" "No feedback" Nothing
+    ( Model navKey submissionId Nothing reviewerId "0.0" "No feedback" Nothing Nothing
     , Cmd.batch
         [ Cmd.map AttemptsMsg (ApiClient.Attempts.getSubmissionAttempts submissionId)
         , Cmd.map SubmissionsMsg <| getSubmission submissionId
+        , Cmd.map GradingMsg (ApiClient.Grading.getGradings submissionId)
         ]
     )
 
@@ -44,7 +48,7 @@ init navKey reviewerId submissionId =
 
 
 view : Model -> Document Msg
-view { grade, feedback, attempt } =
+view { grade, feedback, attempt, alreadyGraded } =
     { title = "Grade"
     , body =
         [ h1 [] [ text "Grade" ]
@@ -55,20 +59,28 @@ view { grade, feedback, attempt } =
                         div []
                             [ h2 [] [ text "File" ]
                             , p [] [ text submission.file ]
-                            , h2 [] [ text "Set grade" ]
-                            , input
-                                [ value grade, onInput UpdateGrade ]
-                                []
-                            , br [] []
-                            , br [] []
-                            , input
-                                [ value feedback, onInput UpdateFeedback ]
-                                []
-                            , br [] []
-                            , br [] []
-                            , button
-                                [ onClick ChangeGrade ]
-                                [ text "Change grade" ]
+                            , loadingIfNothing alreadyGraded <|
+                                \alreadyGradedMaybe ->
+                                    if alreadyGradedMaybe then
+                                        h2 [] [ text "Already graded" ]
+
+                                    else
+                                        div []
+                                            [ h2 [] [ text "Set grade" ]
+                                            , input
+                                                [ value grade, onInput UpdateGrade ]
+                                                []
+                                            , br [] []
+                                            , br [] []
+                                            , input
+                                                [ value feedback, onInput UpdateFeedback ]
+                                                []
+                                            , br [] []
+                                            , br [] []
+                                            , button
+                                                [ onClick ChangeGrade ]
+                                                [ text "Grade" ]
+                                            ]
                             ]
 
                     Right _ ->
@@ -107,6 +119,14 @@ update msg model =
                 _ ->
                     ( model, none )
 
+        GradingMsg (ApiClient.Grading.ReceivedGradings result) ->
+            case result of
+                Ok gradings ->
+                    ( { model | alreadyGraded = Just (not (isEmpty gradings)) }, none )
+
+                _ ->
+                    ( model, none )
+
         AttemptsMsg _ ->
             ( model, none )
 
@@ -133,9 +153,6 @@ update msg model =
                                 ""
                        )
             )
-
-        GradingMsg _ ->
-            ( model, none )
 
         SubmissionsMsg (ReceivedSubmissions result) ->
             case result of
