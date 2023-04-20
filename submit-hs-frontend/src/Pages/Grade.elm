@@ -16,11 +16,11 @@ import ApiClient.Grading exposing (Msg(..))
 
 
 type alias Model =
-    { navKey : Key, grade : String }
+    { navKey : Key, submissionId: Int, reviewerId: Int, grade : String, feedback: String }
 
-init : Key -> ( Model, Cmd Msg )
-init navKey =
-    ( Model navKey "0.0", Cmd.map UsersMsg getUsers )
+init : Key -> Int -> Int -> ( Model, Cmd Msg )
+init navKey reviewerId submissionId =
+    ( Model navKey submissionId reviewerId "0.0" "", Cmd.map GradingMsg (ApiClient.Grading.getGradings 0))
 
 
 
@@ -62,23 +62,18 @@ update msg model =
             case result of
                 Ok gradings ->
                     case gradings of
-                        [ grading ] ->
-                            ( { model | userSubmission = Just <| Left submission }
-                            , Cmd.map AttemptsMsg <| getSubmissionAttempts submission.id
-                            )
-
+                        (grading :: _) -> ({ model | grade = String.fromFloat grading.grade }, none)
                         _ ->
-                            ( { model | userSubmission = Just <| Right False }, Cmd.none )
+                            ( model, none)
 
                 -- TODO: Handle
                 _ ->
-                    ( model, Cmd.none )
-
-        GradingMsg _ ->
-            ( model, none )
+                    ( model, none )
 
         UpdateGrade grade ->
             ( { model | grade = grade }, none )
 
         ChangeGrade ->
-            ( model, Cmd.map GradingMsg (createUser model.username model.userType) )
+            ( model, Cmd.map GradingMsg (ApiClient.Grading.addGrade model.submissionId model.reviewerId model.grade model.feedback) )
+        
+        GradingMsg _ -> (model, none)

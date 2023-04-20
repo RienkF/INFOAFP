@@ -21,6 +21,7 @@ import Platform.Sub
 import Route exposing (Route(..))
 import Url exposing (Url)
 import Pages.Grade
+import Pages.Grade exposing (Msg(..))
 
 
 
@@ -37,6 +38,7 @@ type Model
     | AddAssignmentModel Pages.AddAssignment.Model
     | AssignmentModel Pages.Assignment.Model
     | AddAttemptModel Pages.AddAttempt.Model
+    | GradingModel Pages.Grade.Model
 
 
 init : () -> Url.Url -> Key -> ( Model, Cmd Msg )
@@ -152,7 +154,7 @@ changeRouteTo maybeRoute model =
         
         Just (Route.Grade userId submissionId) ->
             Pages.Grade.init (getKey model) userId submissionId
-                |> updateWith SubmissionM
+                |> updateWith GradingModel GradingMsg model
 
         Just (Route.AddAttempt userId assignmentId) ->
             Pages.AddAttempt.init (getKey model) userId assignmentId
