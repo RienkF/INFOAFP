@@ -19,6 +19,7 @@ import Platform.Cmd
 import Platform.Sub
 import Route exposing (Route(..))
 import Url exposing (Url)
+import Pages.Grade
 
 
 
@@ -142,6 +143,10 @@ changeRouteTo maybeRoute model =
         Just (Route.Assignment userId assignmentId) ->
             Pages.Assignment.init (getKey model) userId assignmentId
                 |> updateWith AssignmentModel AssignmentMsg model
+        
+        Just (Route.Grade userId submissionId) ->
+            Pages.Grade.init (getKey model) userId submissionId
+                |> updateWith SubmissionM
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )

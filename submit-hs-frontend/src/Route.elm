@@ -13,6 +13,7 @@ type Route
     | AddParticipant Int Int
     | AddAssignment Int Int
     | Assignment Int Int
+    | Grade Int Int
 
 
 parser : Parser (Route -> a) a
@@ -26,6 +27,7 @@ parser =
         , Parser.map AddParticipant (s "users" </> int </> s "classrooms" </> int </> s "addParticipant")
         , Parser.map AddAssignment (s "users" </> int </> s "classrooms" </> int </> s "assignments" </> s "add")
         , Parser.map Assignment (s "users" </> int </> s "assignments" </> int)
+        , Parser.map Grade (s "users" </> int </> s "submissions" </> int </> s "grade")
         ]
 
 
