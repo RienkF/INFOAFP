@@ -16,15 +16,13 @@ import Pages.Assignment
 import Pages.Attempt
 import Pages.Classroom
 import Pages.Classrooms exposing (Model, Msg)
+import Pages.Grade exposing (Msg(..))
 import Pages.Login exposing (Model, Msg(..), init)
 import Pages.Register
 import Platform.Cmd
 import Platform.Sub
 import Route exposing (Route(..))
 import Url exposing (Url)
-import Pages.Grade
-import Pages.Grade exposing (Msg(..))
-import ApiClient.Grading exposing (Grading)
 
 
 
@@ -95,7 +93,7 @@ view model =
 
         AddAttemptModel addAttemptModel ->
             useView (Pages.AddAttempt.view addAttemptModel) AddAttemptMsg
-        
+
         GradingModel gradeModel ->
             useView (Pages.Grade.view gradeModel) GradingMsg
 
@@ -168,7 +166,7 @@ changeRouteTo maybeRoute model =
         Just (Route.Assignment userId assignmentId) ->
             Pages.Assignment.init (getKey model) userId assignmentId
                 |> updateWith AssignmentModel AssignmentMsg model
-        
+
         Just (Route.Grade userId submissionId) ->
             Pages.Grade.init (getKey model) userId submissionId
                 |> updateWith GradingModel GradingMsg model
@@ -243,7 +241,7 @@ update msg model =
         ( AddAttemptMsg addAttemptMsg, AddAttemptModel addAttemptModel ) ->
             Pages.AddAttempt.update addAttemptMsg addAttemptModel
                 |> updateWith AddAttemptModel AddAttemptMsg model
-        
+
         ( GradingMsg gradingMsg, GradingModel gradingModel ) ->
             Pages.Grade.update gradingMsg gradingModel
                 |> updateWith GradingModel GradingMsg model
@@ -292,7 +290,7 @@ getKey model =
 
         AddAttemptModel addAttemptModel ->
             addAttemptModel.navKey
-        
+
         GradingModel gradingModel ->
             gradingModel.navKey
 

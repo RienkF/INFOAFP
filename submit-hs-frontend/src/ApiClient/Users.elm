@@ -50,7 +50,9 @@ stringToUserType userType =
 
 
 type Msg
-    = DataReceived (Result Http.Error (List User))
+    = UsersDataReceived (Result Http.Error (List User))
+    | ReviewerDataReceived (Result Http.Error (List User))
+    | UserDataReceived (Result Http.Error (List User))
     | ClassroomUsersDataReceived (Result Http.Error (List User))
     | UserCreated (Result Http.Error (Maybe User))
 
@@ -87,7 +89,7 @@ getUsers : Cmd Msg
 getUsers =
     Http.get
         { url = "http://localhost:3000/users"
-        , expect = Http.expectJson DataReceived (list userDecoder)
+        , expect = Http.expectJson UsersDataReceived (list userDecoder)
         }
 
 
@@ -95,7 +97,15 @@ getUser : Int -> Cmd Msg
 getUser userId =
     Http.get
         { url = "http://localhost:3000/users?userIds=" ++ fromInt userId
-        , expect = Http.expectJson DataReceived (list userDecoder)
+        , expect = Http.expectJson UserDataReceived (list userDecoder)
+        }
+
+
+getReviewer : Int -> Cmd Msg
+getReviewer reviewerId =
+    Http.get
+        { url = "http://localhost:3000/users?userIds=" ++ fromInt reviewerId
+        , expect = Http.expectJson ReviewerDataReceived (list userDecoder)
         }
 
 

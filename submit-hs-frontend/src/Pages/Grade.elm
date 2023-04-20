@@ -1,20 +1,17 @@
 module Pages.Grade exposing (..)
 
+import ApiClient.Attempts exposing (Attempt)
+import ApiClient.Grading exposing (Msg(..))
+import ApiClient.Submissions exposing (Msg(..), Submission, getSubmission)
 import ApiClient.Users exposing (Msg(..), UserType(..))
 import Browser exposing (Document)
-import Browser.Navigation exposing (Key)
+import Browser.Navigation exposing (Key, pushUrl)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Platform.Cmd exposing (none)
-import ApiClient.Grading
-import ApiClient.Grading exposing (Msg(..))
-import ApiClient.Submissions
-import ApiClient.Attempts
-import ApiClient.Attempts exposing (Attempt)
-import Util exposing (loadingIfNothing)
-import Json.Decode exposing (at)
-import Util exposing (Either(..))
+import String exposing (fromInt)
+import Util exposing (Either(..), loadingIfNothing)
 
 
 
@@ -22,17 +19,32 @@ import Util exposing (Either(..))
 
 
 type alias Model =
-    { navKey : Key, submissionId: Int, reviewerId: Int, grade : String, feedback: String, attempt: Maybe (Either Attempt Bool) }
+    { navKey : Key
+    , submissionId : Int
+    , submissionData : Maybe Submission
+    , reviewerId : Int
+    , grade : String
+    , feedback : String
+    , attempt : Maybe (Either Attempt Bool)
+    }
+
 
 init : Key -> Int -> Int -> ( Model, Cmd Msg )
 init navKey reviewerId submissionId =
-    ( Model navKey submissionId reviewerId "0.0" "No feedback" Nothing, Cmd.map AttemptsMessage (ApiClient.Attempts.getSubmissionAttempts submissionId))
+    ( Model navKey submissionId Nothing reviewerId "0.0" "No feedback" Nothing
+    , Cmd.batch
+        [ Cmd.map AttemptsMsg (ApiClient.Attempts.getSubmissionAttempts submissionId)
+        , Cmd.map SubmissionsMsg <| getSubmission submissionId
+        ]
+    )
+
+
 
 -- VIEW
 
 
 view : Model -> Document Msg
-view { grade, feedback, attempt} =
+view { grade, feedback, attempt } =
     { title = "Grade"
     , body =
         [ h1 [] [ text "Grade" ]
@@ -41,7 +53,7 @@ view { grade, feedback, attempt} =
                 case attemptMaybe of
                     Left submission ->
                         div []
-                            [ h2 [] [ text "File"]
+                            [ h2 [] [ text "File" ]
                             , p [] [ text submission.file ]
                             , h2 [] [ text "Set grade" ]
                             , input
@@ -73,31 +85,65 @@ type Msg
     = UpdateGrade String
     | UpdateFeedback String
     | ChangeGrade
-    | NewGrade ApiClient.Grading.Msg
-    | AttemptsMessage ApiClient.Attempts.Msg
+    | GradingMsg ApiClient.Grading.Msg
+    | AttemptsMsg ApiClient.Attempts.Msg
+    | SubmissionsMsg ApiClient.Submissions.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        AttemptsMessage (ApiClient.Attempts.ReceivedSubmissionAttempts result) ->
+        AttemptsMsg (ApiClient.Attempts.ReceivedSubmissionAttempts result) ->
             case result of
                 Ok attempts ->
                     case attempts of
-                        ( attempt :: _  ) -> ({ model | attempt = Just (Left attempt)}, none)
-                        _ -> ({ model | attempt = Just (Right False)}, none)
+                        attempt :: _ ->
+                            ( { model | attempt = Just (Left attempt) }, none )
+
+                        _ ->
+                            ( { model | attempt = Just (Right False) }, none )
 
                 -- TODO: Handle
                 _ ->
                     ( model, none )
 
+        AttemptsMsg _ ->
+            ( model, none )
+
         UpdateGrade grade ->
             ( { model | grade = grade }, none )
-        
+
         UpdateFeedback feedback ->
             ( { model | feedback = feedback }, none )
 
         ChangeGrade ->
-            ( model, Cmd.map NewGrade (ApiClient.Grading.addGrade model.submissionId model.reviewerId model.grade model.feedback) )
-        
-        _ -> (model, none)
+            ( model, Cmd.map GradingMsg (ApiClient.Grading.addGrade model.submissionId model.reviewerId model.grade model.feedback) )
+
+        GradingMsg (GradingCreated _) ->
+            ( model
+            , pushUrl model.navKey <|
+                "/users/"
+                    ++ fromInt model.reviewerId
+                    ++ "/assignments/"
+                    ++ (case model.submissionData of
+                            Just submission ->
+                                fromInt submission.assignmentId
+
+                            Nothing ->
+                                ""
+                       )
+            )
+
+        GradingMsg _ ->
+            ( model, none )
+
+        SubmissionsMsg (ReceivedSubmissions result) ->
+            case result of
+                Ok [ submission ] ->
+                    ( { model | submissionData = Just submission }, none )
+
+                _ ->
+                    ( model, none )
+
+        SubmissionsMsg _ ->
+            ( model, none )

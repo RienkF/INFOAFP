@@ -102,7 +102,7 @@ view { userId, userData, classroomData, assignmentsData, participantsData } =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        UsersMsg (ApiClient.Users.DataReceived result) ->
+        UsersMsg (ApiClient.Users.UserDataReceived result) ->
             case result of
                 Ok [ user ] ->
                     ( { model | userData = Just user }

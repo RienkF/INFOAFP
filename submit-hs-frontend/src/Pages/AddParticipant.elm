@@ -94,7 +94,7 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        UsersMsg (ApiClient.Users.DataReceived result) ->
+        UsersMsg (ApiClient.Users.UsersDataReceived result) ->
             case result of
                 Ok users ->
                     ( { model | userOptions = Just users }
