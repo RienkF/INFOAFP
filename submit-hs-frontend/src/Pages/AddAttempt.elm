@@ -1,8 +1,6 @@
 module Pages.AddAttempt exposing (..)
 
-import ApiClient.Assignments exposing (Msg(..), createAssignment)
 import ApiClient.Attempts exposing (Msg(..), submitAttempt)
-import ApiClient.Classrooms exposing (Msg(..))
 import ApiClient.Submissions exposing (Msg(..), Submission, getUserSubmission)
 import Browser exposing (Document)
 import Browser.Navigation exposing (Key, pushUrl)
@@ -11,7 +9,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Pages.Classrooms exposing (Msg(..))
 import Platform.Cmd exposing (none)
-import String exposing (fromFloat, fromInt)
+import String exposing (fromInt)
 import Util exposing (Either(..), loadingIfNothing)
 
 
@@ -45,10 +43,10 @@ view { fileData, submissionData } =
         , loadingIfNothing submissionData <|
             \submissionMaybe ->
                 case submissionMaybe of
-                    Left submission ->
+                    Left _ ->
                         div []
                             [ h2 [] [ text "Input a the file content of the attempt" ]
-                            , input
+                            , textarea
                                 [ value fileData, onInput UpdateFile ]
                                 []
                             , br [] []

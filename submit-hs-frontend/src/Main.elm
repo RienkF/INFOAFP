@@ -13,6 +13,7 @@ import Pages.AddClassroom
 import Pages.AddParticipant
 import Pages.AddSubmission
 import Pages.Assignment
+import Pages.Attempt
 import Pages.Classroom
 import Pages.Classrooms exposing (Model, Msg)
 import Pages.Login exposing (Model, Msg(..), init)
@@ -38,6 +39,7 @@ type Model
     | AssignmentModel Pages.Assignment.Model
     | AddSubmissionModel Pages.AddSubmission.Model
     | AddAttemptModel Pages.AddAttempt.Model
+    | AttemptModel Pages.Attempt.Model
 
 
 init : () -> Url.Url -> Key -> ( Model, Cmd Msg )
@@ -90,6 +92,9 @@ view model =
         AddAttemptModel addAttemptModel ->
             useView (Pages.AddAttempt.view addAttemptModel) AddAttemptMsg
 
+        AttemptModel attemptModel ->
+            useView (Pages.Attempt.view attemptModel) AttemptMsg
+
 
 useView : Document a -> (a -> Msg) -> Document Msg
 useView result mapMsg =
@@ -113,6 +118,7 @@ type Msg
     | AssignmentMsg Pages.Assignment.Msg
     | AddSubmissionMsg Pages.AddSubmission.Msg
     | AddAttemptMsg Pages.AddAttempt.Msg
+    | AttemptMsg Pages.Attempt.Msg
     | NoMsg
 
 
@@ -162,6 +168,10 @@ changeRouteTo maybeRoute model =
         Just (Route.AddAttempt userId assignmentId) ->
             Pages.AddAttempt.init (getKey model) userId assignmentId
                 |> updateWith AddAttemptModel AddAttemptMsg model
+
+        Just (Route.Attempt userId attemptId) ->
+            Pages.Attempt.init (getKey model) userId attemptId
+                |> updateWith AttemptModel AttemptMsg model
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -222,6 +232,10 @@ update msg model =
             Pages.AddAttempt.update addAttemptMsg addAttemptModel
                 |> updateWith AddAttemptModel AddAttemptMsg model
 
+        ( AttemptMsg attemptMsg, AttemptModel attemptModel ) ->
+            Pages.Attempt.update attemptMsg attemptModel
+                |> updateWith AttemptModel AttemptMsg model
+
         ( NoMsg, _ ) ->
             ( model, Platform.Cmd.none )
 
@@ -262,6 +276,9 @@ getKey model =
 
         AddAttemptModel addAttemptModel ->
             addAttemptModel.navKey
+
+        AttemptModel attemptModel ->
+            attemptModel.navKey
 
 
 updateWith : (subModel -> Model) -> (subMsg -> Msg) -> Model -> ( subModel, Cmd subMsg ) -> ( Model, Cmd Msg )

@@ -6,10 +6,10 @@ import ApiClient.Submissions exposing (Submission, Submissions, getAssignmentSub
 import ApiClient.Users exposing (User, UserType(..), Users, getClassroomUsers, getUser)
 import Browser exposing (Document)
 import Browser.Navigation exposing (Key, pushUrl)
-import Html exposing (a, button, div, h1, h2, li, p, span, text, ul)
+import Html exposing (a, button, div, h1, h2, h3, li, p, span, text, ul)
 import Html.Attributes exposing (href)
 import Html.Events exposing (onClick)
-import List exposing (filter, map)
+import List exposing (filter, map, reverse, sortBy)
 import String exposing (fromInt)
 import Util exposing (Either(..), findBy, loadingIfNothing)
 
@@ -20,7 +20,7 @@ import Util exposing (Either(..), findBy, loadingIfNothing)
 
 init : Key -> Int -> Int -> ( Model, Cmd Msg )
 init navKey userId assignmentId =
-    ( Model navKey userId Nothing assignmentId Nothing Nothing Nothing Nothing Nothing
+    ( Model navKey userId Nothing assignmentId Nothing Nothing Nothing Nothing Nothing Nothing
     , Cmd.batch
         [ Cmd.map UsersMsg (getUser userId)
         , Cmd.map AssignmentsMsg (getAssignment assignmentId)
@@ -38,6 +38,7 @@ type alias Model =
     , participantsSubmissions : Maybe Submissions
     , userSubmission : Maybe (Either Submission Bool)
     , userAttempts : Maybe Attempts
+    , userGrade : Maybe Bool
     }
 
 
@@ -46,7 +47,7 @@ type alias Model =
 
 
 view : Model -> Document Msg
-view { userId, userData, assignmentData, participantsData, participantsSubmissions, userSubmission, userAttempts } =
+view { userId, userData, assignmentData, participantsData, participantsSubmissions, userSubmission, userAttempts, userGrade } =
     { title = "Assignment"
     , body =
         [ loadingIfNothing assignmentData <|
@@ -60,14 +61,38 @@ view { userId, userData, assignmentData, participantsData, participantsSubmissio
                                 Student ->
                                     div []
                                         [ h2 [] [ text "My submission:" ]
+                                        , h3 [] [ text "Grade:" ]
+                                        , loadingIfNothing userGrade <|
+                                            \grade ->
+                                                case grade of
+                                                    False ->
+                                                        p [] [ text "No grade yet" ]
+
+                                                    True ->
+                                                        p [] [ text "You have a grade" ]
+                                        , h3 [] [ text "Attempts:" ]
                                         , loadingIfNothing userSubmission <|
                                             \submission ->
                                                 case submission of
                                                     Left _ ->
                                                         loadingIfNothing userAttempts <|
                                                             \attempts ->
+                                                                let
+                                                                    sortedAttempts =
+                                                                        reverse <| sortBy (\attempt -> attempt.timeStamp) attempts
+                                                                in
                                                                 div []
-                                                                    [ ul [] <| map (\attempt -> li [] [ text <| "attempt: " ++ fromInt attempt.id ]) attempts
+                                                                    [ ul [] <|
+                                                                        map
+                                                                            (\attempt ->
+                                                                                li
+                                                                                    []
+                                                                                    [ a
+                                                                                        [ href <| "/users/" ++ fromInt userId ++ "/attempts/" ++ fromInt attempt.id ]
+                                                                                        [ text <| attempt.timeStamp ++ " | attempt id: " ++ fromInt attempt.id ]
+                                                                                    ]
+                                                                            )
+                                                                            sortedAttempts
                                                                     , button [ onClick AddAttemptClicked ] [ text "New attempt" ]
                                                                     ]
 
