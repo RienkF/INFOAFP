@@ -30,7 +30,7 @@ server =
   ( getUsers :<|> addUser :<|> delUserById
   )
     :<|> (getClassrooms :<|> addClassroom :<|> deleteClassroom)
-    :<|> (getClassroomParticipants :<|> addClassroomParticipant)
+    :<|> (getClassroomParticipants :<|> addClassroomParticipant :<|> deleteClassroomParticipant)
     :<|> (getAssignments :<|> addAssignment :<|> deleteAssignment)
     :<|> (getSubmissions :<|> addSubmission :<|> deleteSubmission)
     :<|> (getAttempts :<|> addAttempt :<|> deleteAttempt)

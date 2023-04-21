@@ -49,3 +49,6 @@ addClassroomParticipant body = do
         _ -> return Nothing
     -- There should be exactly one classroom for a given Id
     _ -> return Nothing
+
+deleteClassroomParticipant :: Int -> Handler NoContent
+deleteClassroomParticipant id = liftIO $ Database.Classrooms.deleteClassroomParticipantByUser id >> return NoContent

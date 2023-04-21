@@ -5,6 +5,7 @@ import Database.Beam
 import Database.Beam.Sqlite
 import Database.Db (SubmitDb (classroomParticipants, classrooms, users), databaseConnection, submitDb)
 import Database.Model
+import Application.Users (getUsers)
 
 getClassrooms :: Maybe [Int] -> Maybe [Int] -> IO [Classroom]
 getClassrooms classRoomFilter userIdFilter = do
@@ -73,3 +74,11 @@ addClassroomParticipant user classroom = do
           [classroomParticipant] -> Just classroomParticipant
           _ -> Nothing
       )
+
+deleteClassroomParticipantByUser :: Int -> IO ()
+deleteClassroomParticipantByUser id = do
+  conn <- databaseConnection
+  runBeamSqlite conn $ do
+    runDelete $ delete (classroomParticipants submitDb) $
+      \classroomParticipant -> _classroomParticipantUser classroomParticipant
+      ==. val_ (UserId (fromIntegral id))
