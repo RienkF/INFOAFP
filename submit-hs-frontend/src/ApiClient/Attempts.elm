@@ -18,6 +18,7 @@ type Msg
     = ReceivedAttempt (Result Http.Error (List Attempt))
     | ReceivedSubmissionAttempts (Result Http.Error (List Attempt))
     | AttemptCreated (Result Http.Error (Maybe Attempt))
+    | AttemptDeleted (Result Http.Error ())
 
 
 
@@ -55,6 +56,18 @@ submitAttempt submissionId fileContent =
         { body = jsonBody (encodeAttemptBody submissionId fileContent)
         , expect = Http.expectJson AttemptCreated (maybe attemptDecoder)
         , url = "http://localhost:3000/attempts/add"
+        }
+
+deleteAttempt : Int -> Cmd Msg
+deleteAttempt attemptId =
+    Http.request
+        { method = "DELETE"
+        , headers = []
+        , url = "http://localhost:3000/attempts/" ++ fromInt attemptId
+        , body = Http.emptyBody
+        , expect = Http.expectWhatever AttemptDeleted
+        , timeout = Nothing
+        , tracker = Nothing
         }
 
 

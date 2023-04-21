@@ -10,6 +10,9 @@ import Html.Events exposing (onClick)
 import List exposing (map)
 import String exposing (fromInt)
 import Util exposing (loadingIfNothing)
+import ApiClient.Attempts exposing (deleteAttempt)
+import ApiClient.Attempts exposing (Msg(..))
+import Browser.Navigation exposing (back)
 
 
 
@@ -45,7 +48,11 @@ view { attemptId, attemptData } =
             [ h1 [] [ text ("Attempt: " ++ fromInt attemptId) ]
             , loadingIfNothing attemptData
                 (\attempt ->
-                    p [] [ text attempt.file ]
+                    div [] [ p [] [ text attempt.file ]
+                           , button
+                             [ onClick DeleteMsg ]
+                             [ text "Delete Attempt" ] 
+                           ]
                 )
             ]
         ]
@@ -69,10 +76,26 @@ update msg model =
                 -- TODO: Handle
                 _ ->
                     ( model, Cmd.none )
-
         AttemptsMsg _ ->
             ( model, Cmd.none )
+        DeleteMsg ->
+            ( model, Cmd.map DeleteResultMsg (deleteAttempt model.attemptId) )
+        DeleteResultMsg (AttemptDeleted result) ->
+            case result of
+                Ok _ ->
+                    ( model
+                    , back model.navKey 1
+                    )
+
+                -- TODO: Handle
+                Err _ ->
+                    ( model, Cmd.none )
+        DeleteResultMsg _ ->
+            ( model, Cmd.none )
+
 
 
 type Msg
     = AttemptsMsg ApiClient.Attempts.Msg
+    | DeleteMsg
+    | DeleteResultMsg ApiClient.Attempts.Msg
