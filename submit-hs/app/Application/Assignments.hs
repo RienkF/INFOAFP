@@ -10,6 +10,7 @@ import Database.Model
 import qualified Database.Model as Database
 import qualified Database.Users
 import Servant
+import Data.List.NonEmpty (NonEmpty)
 
 getAssignments :: Maybe [Int] -> Maybe [Int] -> Handler [Assignment]
 getAssignments assignmentIds classroomIds = liftIO $ Database.Assignments.getAssignments assignmentIds classroomIds
@@ -29,7 +30,5 @@ addAssignment body = do
           classroom
     _ -> return Nothing
 
-deleteAssignment :: Maybe Int -> Handler ()
-deleteAssignment mId = case mId of
-  Just id -> liftIO $ Database.Assignments.deleteAssignment id
-  _ -> return ()
+deleteAssignment :: Int -> Handler NoContent
+deleteAssignment id = liftIO $ Database.Assignments.deleteAssignment id >> return NoContent

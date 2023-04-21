@@ -37,3 +37,6 @@ addSubmission body = do
             _ -> return Nothing
         _ -> return Nothing
     _ -> return Nothing
+
+deleteSubmission :: Int -> Handler NoContent
+deleteSubmission id = liftIO $ Database.Submission.deleteSubmission id >> return NoContent

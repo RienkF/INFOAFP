@@ -21,12 +21,13 @@ import Servant
 type Spec =
   "users"
     :> ( QueryParam "userIds" [Int] :> QueryParam "classroomIds" [Int] :> Get '[JSON] [User]
-           :<|> "add" :> ReqBody '[JSON] AddUserBody :> Post '[JSON] (Maybe User)
-           :<|> "del" :> ReqBody '[JSON] DelUserBody :> Delete '[JSON] ()
+          :<|> "add" :> ReqBody '[JSON] AddUserBody :> Post '[JSON] (Maybe User)
+          :<|> Capture "userId" Int :> DeleteNoContent
        )
     :<|> "classrooms"
       :> ( QueryParam "classroomIds" [Int] :> QueryParam "userIds" [Int] :> Get '[JSON] [Classroom]
              :<|> "add" :> ReqBody '[JSON] AddClassroomBody :> Post '[JSON] (Maybe Classroom)
+             :<|> Capture "classroomId" Int :> DeleteNoContent
          )
     :<|> "classroomParticipants"
       :> ( Get '[JSON] [ClassroomParticipant]
@@ -35,19 +36,22 @@ type Spec =
     :<|> "assignments"
       :> ( QueryParam "assignmentIds" [Int] :> QueryParam "classroomIds" [Int] :> Get '[JSON] [Assignment]
              :<|> "add" :> ReqBody '[JSON] AddAssignmentBody :> Post '[JSON] (Maybe Assignment)
-             :<|> "delete" :> QueryParam "assignmentId" Int :> Delete '[JSON] ()
+             :<|> Capture "assignmentId" Int :> DeleteNoContent
          )
     :<|> "submissions"
       :> ( QueryParam "submissionIds" [Int] :> QueryParam "userIds" [Int] :> QueryParam "assignmentIds" [Int] :> Get '[JSON] [Submission]
              :<|> "add" :> ReqBody '[JSON] AddSubmissionBody :> Post '[JSON] (Maybe Submission)
+             :<|> Capture "submissionId" Int :> DeleteNoContent
          )
     :<|> "attempts"
       :> ( QueryParam "attemptIds" [Int] :> QueryParam "submissionIds" [Int] :> Get '[JSON] [Attempt]
              :<|> "add" :> ReqBody '[JSON] AddAttemptBody :> Post '[JSON] (Maybe Attempt)
+             :<|> Capture "attemptId" Int :> DeleteNoContent
          )
     :<|> "gradings"
       :> ( QueryParam "gradingIds" [Int] :> QueryParam "submissionIds" [Int] :> QueryParam "assignmentIds" [Int] :> Get '[JSON] [Grading]
              :<|> "add" :> ReqBody '[JSON] AddGradingBody :> Post '[JSON] (Maybe Grading)
+             :<|> Capture "gradingId" Int :> DeleteNoContent
          )
     :<|> Raw -- This final raw is just so we can serve the index file of the frontend
 

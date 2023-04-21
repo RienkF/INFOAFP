@@ -14,7 +14,6 @@ addUser :: AddUserBody -> Handler (Maybe User)
 addUser body = do
   liftIO $ Database.Users.addUser (userName body) (userType body)
 
-delUserById :: DelUserBody -> Handler ()
-delUserById body = do
-  liftIO $ Database.Users.delUserById (userId body)
+delUserById :: Int -> Handler NoContent
+delUserById id = liftIO $ Database.Users.delUserById id >> return NoContent
 

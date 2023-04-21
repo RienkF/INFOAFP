@@ -30,6 +30,9 @@ addClassroom body = do
         Nothing -> return Nothing
     _ -> return Nothing
 
+deleteClassroom :: Int -> Handler NoContent
+deleteClassroom id = liftIO $ Database.Classrooms.deleteClassroom id >> return NoContent
+
 addClassroomParticipant :: AddClassroomParticipantBody -> Handler (Maybe ClassroomParticipant)
 addClassroomParticipant body = do
   classrooms <- liftIO $ Database.Classrooms.getClassrooms (Just [classroomId body]) Nothing

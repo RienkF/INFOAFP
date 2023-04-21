@@ -53,6 +53,12 @@ addClassroom classroomName = do
           _ -> Nothing
       )
 
+deleteClassroom :: Int -> IO ()
+deleteClassroom id = do
+  conn <- databaseConnection
+  runBeamSqlite conn $ runDelete $ delete (classrooms submitDb)
+        (\c -> _classroomId c ==. fromIntegral id)
+
 addClassroomParticipant :: User -> Classroom -> IO (Maybe ClassroomParticipant)
 addClassroomParticipant user classroom = do
   conn <- databaseConnection

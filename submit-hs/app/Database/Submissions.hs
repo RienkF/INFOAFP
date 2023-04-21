@@ -52,3 +52,9 @@ addSubmission user assignment = do
           [submission] -> Just submission
           _ -> Nothing
       )
+
+deleteSubmission :: Int -> IO ()
+deleteSubmission id = do
+  conn <- databaseConnection
+  runBeamSqlite conn $ runDelete $ delete (submissions submitDb)
+        (\c -> _submissionId c ==. fromIntegral id)

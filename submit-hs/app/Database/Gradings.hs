@@ -58,3 +58,9 @@ addGrading submission grade reviewer feedback = do
           [grading] -> Just grading
           _ -> Nothing
       )
+
+deleteGrading :: Int -> IO ()
+deleteGrading id = do
+  conn <- databaseConnection
+  runBeamSqlite conn $ runDelete $ delete (gradings submitDb)
+        (\c -> _gradingId c ==. fromIntegral id)

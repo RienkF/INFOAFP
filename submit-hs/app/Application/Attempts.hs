@@ -21,3 +21,6 @@ addAttempt body = do
           submission
           (file body)
     _ -> return Nothing
+
+deleteAttempt :: Int -> Handler NoContent
+deleteAttempt id = liftIO $ Database.Attempts.deleteAttempt id >> return NoContent

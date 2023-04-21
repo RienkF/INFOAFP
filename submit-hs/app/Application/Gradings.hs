@@ -27,3 +27,6 @@ addGrading body = do
           liftIO $ Database.Gradings.addGrading submission (grade body) reviewer (feedback body)
         _ -> return Nothing
     _ -> return Nothing
+
+deleteGrading :: Int -> Handler NoContent
+deleteGrading id = liftIO $ Database.Gradings.deleteGrading id >> return NoContent

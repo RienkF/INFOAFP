@@ -47,3 +47,10 @@ addAttempt submission file = do
           [attempt] -> Just attempt
           _ -> Nothing
       )
+
+
+deleteAttempt :: Int -> IO ()
+deleteAttempt attemptId = do
+  conn <- databaseConnection
+  runBeamSqlite conn $ runDelete $ delete (attempts submitDb)
+        (\c -> _attemptId c ==. fromIntegral attemptId)

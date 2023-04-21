@@ -29,12 +29,12 @@ server :: Server Api.Spec.Spec
 server =
   ( getUsers :<|> addUser :<|> delUserById
   )
-    :<|> (getClassrooms :<|> addClassroom)
+    :<|> (getClassrooms :<|> addClassroom :<|> deleteClassroom)
     :<|> (getClassroomParticipants :<|> addClassroomParticipant)
     :<|> (getAssignments :<|> addAssignment :<|> deleteAssignment)
-    :<|> (getSubmissions :<|> addSubmission)
-    :<|> (getAttempts :<|> addAttempt)
-    :<|> (getGradings :<|> addGrading)
+    :<|> (getSubmissions :<|> addSubmission :<|> deleteSubmission)
+    :<|> (getAttempts :<|> addAttempt :<|> deleteAttempt)
+    :<|> (getGradings :<|> addGrading :<|> deleteGrading)
     :<|> serveDirectoryFileServer "static/"
 
 application :: Application

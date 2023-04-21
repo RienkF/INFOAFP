@@ -17,11 +17,6 @@ data AddUserBody = AddUserBody
   }
   deriving (Generic, FromJSON)
 
-data DelUserBody = DelUserBody
-  { userId :: Int
-  }
-  deriving (Generic, FromJSON)
-
 instance FromJSON UserType where
   parseJSON :: Value -> Parser UserType
   parseJSON = withText "userType" $ \case
