@@ -10,6 +10,8 @@ import List exposing (append)
 import Platform.Cmd exposing (none)
 import String exposing (fromInt, toInt)
 import Util exposing (isNothing)
+import ApiClient.Users exposing (deleteUser)
+import Browser.Navigation exposing (reload)
 
 
 
@@ -53,13 +55,16 @@ view { selectedUserId, userOptions } =
     { title = "Login"
     , body =
         [ h1 [] [ text "Submit-hs" ]
-        , h2 [] [ text "Please log in" ]
+        , h2 [] [ text "Please select user" ]
         , select
             [ value selectedValue, onInput (\x -> UpdateUser (toInt x)) ]
             options
         , button
             [ onClick SubmitUser, disabled (isNothing selectedUserId) ]
-            [ text "Ok" ]
+            [ text "Login" ]
+        , button
+            [ onClick Delete, disabled (isNothing selectedUserId) ]
+            [ text "Delete User" ]
         , h2 [] [ text "Or click here to register" ]
         , button
             [ onClick RegisterClicked ]
@@ -77,6 +82,8 @@ type Msg
     | SubmitUser
     | UsersMsg ApiClient.Users.Msg
     | RegisterClicked
+    | Delete
+    | DeleteResult ApiClient.Users.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -109,3 +116,14 @@ update msg model =
 
         RegisterClicked ->
             ( model, pushUrl model.navKey "/register" )
+
+        Delete ->
+            case model.selectedUserId of
+                Just id -> ( model, Cmd.map DeleteResult (deleteUser id))
+                _ -> ( model, Cmd.none )
+        DeleteResult (UserDeleted result) ->
+            case result of
+                Ok _ -> ( model , reload )
+                _ -> ( model, Cmd.none )
+        DeleteResult _ ->
+                ( model, Cmd.none )

@@ -55,6 +55,7 @@ type Msg
     | UserDataReceived (Result Http.Error (List User))
     | ClassroomUsersDataReceived (Result Http.Error (List User))
     | UserCreated (Result Http.Error (Maybe User))
+    | UserDeleted (Result Http.Error ())
 
 
 userTypeDecorder : Decoder UserType
@@ -123,6 +124,18 @@ createUser userName userType =
         { body = jsonBody (encodeUserBody userName userType)
         , expect = Http.expectJson UserCreated (maybe userDecoder)
         , url = "http://localhost:3000/users/add"
+        }
+
+deleteUser : Int -> Cmd Msg
+deleteUser userId =
+    Http.request
+        { method = "DELETE"
+        , headers = []
+        , url = "http://localhost:3000/users/" ++ fromInt userId
+        , body = Http.emptyBody
+        , expect = Http.expectWhatever UserDeleted
+        , timeout = Nothing
+        , tracker = Nothing
         }
 
 
