@@ -148,7 +148,7 @@ view { userId, userData, assignmentData, participantsData, participantsSubmissio
                                                                                                         [ span [] [ text "already graded" ]
                                                                                                         , button
                                                                                                             [ onClick (DeleteGradeClicked grading.id) ]
-                                                                                                            [ text "Delete Attempt" ]
+                                                                                                            [ text "Delete grade" ]
                                                                                                         ]
                                                                                     ]
 
