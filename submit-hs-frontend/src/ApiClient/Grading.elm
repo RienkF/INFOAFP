@@ -18,6 +18,7 @@ type Msg
     = ReceivedGradings (Result Http.Error (List Grading))
     | ReceivedAssignmentGradings (Result Http.Error (List Grading))
     | GradingCreated (Result Http.Error (Maybe Grading))
+    | GradingDeleted (Result Http.Error ())
 
 
 gradingDecoder : Decoder Grading
@@ -55,6 +56,17 @@ addGrade submissionId reviewerId grade feedback =
         , url = "http://localhost:3000/gradings/add"
         }
 
+deleteGrade : Int -> Cmd Msg
+deleteGrade gradingId =
+    Http.request
+        { method = "DELETE"
+        , headers = []
+        , url = "http://localhost:3000/gradings/" ++ fromInt gradingId
+        , body = Http.emptyBody
+        , expect = Http.expectWhatever GradingDeleted
+        , timeout = Nothing
+        , tracker = Nothing
+        }
 
 encodeGradeBody : Int -> Int -> String -> String -> Value
 encodeGradeBody submissionId reviewerid grade feedback =

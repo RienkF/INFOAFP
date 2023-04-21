@@ -123,7 +123,7 @@ update msg model =
                 _ -> ( model, Cmd.none )
         DeleteResult (UserDeleted result) ->
             case result of
-                Ok _ -> ( model , reload )
+                Ok () -> ( model, reload )
                 _ -> ( model, Cmd.none )
         DeleteResult _ ->
                 ( model, Cmd.none )

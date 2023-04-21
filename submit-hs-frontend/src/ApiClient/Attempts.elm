@@ -70,7 +70,6 @@ deleteAttempt attemptId =
         , tracker = Nothing
         }
 
-
 encodeAttemptBody : Int -> String -> Value
 encodeAttemptBody submissionId fileContent =
     object

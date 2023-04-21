@@ -13,6 +13,8 @@ import Html.Events exposing (onClick)
 import List exposing (filter, map, reverse, sortBy)
 import String exposing (fromFloat, fromInt)
 import Util exposing (Either(..), findBy, loadingIfNothing)
+import Pages.Grade exposing (Msg(..))
+import ApiClient.Grading exposing (deleteGrade)
 
 
 
@@ -142,8 +144,12 @@ view { userId, userData, assignmentData, participantsData, participantsSubmissio
                                                                                                         [ href <| "/users/" ++ fromInt userId ++ "/submissions/" ++ fromInt submission.id ++ "/grade" ]
                                                                                                         [ text "Grade" ]
 
-                                                                                                Just _ ->
-                                                                                                    span [] [ text "already graded" ]
+                                                                                                Just grading ->
+                                                                                                    div [] [ span [] [ text "already graded" ]
+                                                                                                           , button 
+                                                                                                             [ onClick (DeleteGradeClicked grading.id) ] 
+                                                                                                             [ text "Delete Attempt" ] 
+                                                                                                    ]
                                                                                     ]
 
                                                                             Nothing ->
@@ -311,6 +317,14 @@ update msg model =
                 _ ->
                     ( model, Cmd.none )
 
+        GradingsMsg (ApiClient.Grading.GradingDeleted result) ->
+            case result of
+                Ok () ->
+                    ( model, Cmd.map AssignmentsMsg (getAssignment model.assignmentId) )
+                -- TODO: Handle
+                _ ->
+                    ( model, Cmd.none )
+
         GradingsMsg _ ->
             ( model, Cmd.none )
 
@@ -319,6 +333,9 @@ update msg model =
 
         AddSubmissionClicked ->
             ( model, pushUrl model.navKey <| "/users/" ++ fromInt model.userId ++ "/assignments/" ++ fromInt model.assignmentId ++ "/addSubmission" )
+
+        DeleteGradeClicked gradingId ->
+            ( model, Cmd.map GradingsMsg (deleteGrade gradingId) )
 
 
 type Msg
@@ -329,3 +346,4 @@ type Msg
     | SubmissionsMsg ApiClient.Submissions.Msg
     | AttemptsMsg ApiClient.Attempts.Msg
     | GradingsMsg ApiClient.Grading.Msg
+    | DeleteGradeClicked Int
