@@ -2,7 +2,7 @@ module Pages.Assignment exposing (..)
 
 import ApiClient.Assignments exposing (Assignment, getAssignment)
 import ApiClient.Attempts exposing (Attempts, getSubmissionAttempts)
-import ApiClient.Grading exposing (Grading, Gradings, getAssignmentGrades, getGradings)
+import ApiClient.Grading exposing (Grading, Gradings, deleteGrade, getAssignmentGrades, getGradings)
 import ApiClient.Submissions exposing (Submission, Submissions, getAssignmentSubmissions, getUserSubmission)
 import ApiClient.Users exposing (User, UserType(..), Users, getClassroomUsers, getReviewer, getUser)
 import Browser exposing (Document)
@@ -11,10 +11,9 @@ import Html exposing (a, button, div, h1, h2, h3, li, p, span, text, ul)
 import Html.Attributes exposing (href)
 import Html.Events exposing (onClick)
 import List exposing (filter, map, reverse, sortBy)
+import Pages.Grade exposing (Msg(..))
 import String exposing (fromFloat, fromInt)
 import Util exposing (Either(..), findBy, loadingIfNothing)
-import Pages.Grade exposing (Msg(..))
-import ApiClient.Grading exposing (deleteGrade)
 
 
 
@@ -145,11 +144,12 @@ view { userId, userData, assignmentData, participantsData, participantsSubmissio
                                                                                                         [ text "Grade" ]
 
                                                                                                 Just grading ->
-                                                                                                    div [] [ span [] [ text "already graded" ]
-                                                                                                           , button 
-                                                                                                             [ onClick (DeleteGradeClicked grading.id) ] 
-                                                                                                             [ text "Delete Attempt" ] 
-                                                                                                    ]
+                                                                                                    div []
+                                                                                                        [ span [] [ text "already graded" ]
+                                                                                                        , button
+                                                                                                            [ onClick (DeleteGradeClicked grading.id) ]
+                                                                                                            [ text "Delete Attempt" ]
+                                                                                                        ]
                                                                                     ]
 
                                                                             Nothing ->
@@ -190,7 +190,6 @@ update msg model =
                             Cmd.none
                     )
 
-                -- TODO: Handle
                 _ ->
                     ( model, Cmd.none )
 
@@ -201,7 +200,6 @@ update msg model =
                     , Cmd.map SubmissionsMsg <| getAssignmentSubmissions model.assignmentId
                     )
 
-                -- TODO: Handle
                 _ ->
                     ( model, Cmd.none )
 
@@ -212,7 +210,6 @@ update msg model =
                     , Cmd.none
                     )
 
-                -- TODO: Handle
                 _ ->
                     ( model, Cmd.none )
 
@@ -236,7 +233,6 @@ update msg model =
                             Cmd.none
                     )
 
-                -- TODO: Handle
                 _ ->
                     ( model, Cmd.none )
 
@@ -258,7 +254,6 @@ update msg model =
                         _ ->
                             ( { model | userSubmission = Just <| Right False, userGrade = Just <| Right False }, Cmd.none )
 
-                -- TODO: Handle
                 _ ->
                     ( model, Cmd.none )
 
@@ -267,7 +262,6 @@ update msg model =
                 Ok submissions ->
                     ( { model | participantsSubmissions = Just submissions }, Cmd.map GradingsMsg <| getAssignmentGrades model.assignmentId )
 
-                -- TODO: Handle
                 _ ->
                     ( model, Cmd.none )
 
@@ -281,7 +275,6 @@ update msg model =
                     , Cmd.none
                     )
 
-                -- TODO: Handle
                 _ ->
                     ( model, Cmd.none )
 
@@ -302,7 +295,6 @@ update msg model =
                             , Cmd.none
                             )
 
-                -- TODO: Handle
                 _ ->
                     ( model, Cmd.none )
 
@@ -313,7 +305,6 @@ update msg model =
                     , Cmd.none
                     )
 
-                -- TODO: Handle
                 _ ->
                     ( model, Cmd.none )
 
@@ -321,7 +312,7 @@ update msg model =
             case result of
                 Ok () ->
                     ( model, Cmd.map AssignmentsMsg (getAssignment model.assignmentId) )
-                -- TODO: Handle
+
                 _ ->
                     ( model, Cmd.none )
 

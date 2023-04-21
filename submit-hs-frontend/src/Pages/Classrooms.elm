@@ -80,7 +80,6 @@ update msg model =
                         _ ->
                             ( model, Cmd.none )
 
-                -- TODO: Handle
                 Err _ ->
                     ( model, Cmd.none )
 
@@ -94,7 +93,6 @@ update msg model =
                     , Cmd.none
                     )
 
-                -- TODO: Handle
                 Err _ ->
                     ( model, Cmd.none )
 

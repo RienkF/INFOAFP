@@ -66,7 +66,6 @@ update msg model =
                     , pushUrl model.navKey ("/users/" ++ fromInt model.userId ++ "/classrooms/" ++ fromInt res.id)
                     )
 
-                -- TODO: Handle
                 _ ->
                     ( model, Cmd.none )
 

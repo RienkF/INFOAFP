@@ -9,11 +9,9 @@ import Servant
 getUsers :: Maybe [Int] -> Maybe [Int] -> Handler [User]
 getUsers userIds classroomIds = liftIO $ Database.Users.getUsers userIds classroomIds
 
--- TODO: Add username validation
 addUser :: AddUserBody -> Handler (Maybe User)
 addUser body = do
   liftIO $ Database.Users.addUser (userName body) (userType body)
 
 delUserById :: Int -> Handler NoContent
 delUserById id = liftIO $ Database.Users.delUserById id >> return NoContent
-

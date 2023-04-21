@@ -99,7 +99,6 @@ update msg model =
                     , pushUrl model.navKey <| "/users/" ++ fromInt model.userId ++ "/classrooms/" ++ fromInt model.classroomid
                     )
 
-                -- TODO: Handle
                 _ ->
                     ( model, Cmd.none )
 

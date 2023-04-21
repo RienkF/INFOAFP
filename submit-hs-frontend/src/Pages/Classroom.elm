@@ -109,7 +109,6 @@ update msg model =
                     , Cmd.none
                     )
 
-                -- TODO: Handle
                 _ ->
                     ( model, Cmd.none )
 
@@ -120,7 +119,6 @@ update msg model =
                     , Cmd.none
                     )
 
-                -- TODO: Handle
                 _ ->
                     ( model, Cmd.none )
 
@@ -134,7 +132,6 @@ update msg model =
                     , Cmd.none
                     )
 
-                -- TODO: Handle
                 _ ->
                     ( model, Cmd.none )
 
@@ -148,7 +145,6 @@ update msg model =
                     , Cmd.none
                     )
 
-                -- TODO: Handle
                 _ ->
                     ( model, Cmd.none )
 

@@ -114,7 +114,6 @@ update msg model =
                         _ ->
                             ( { model | attempt = Just (Right False) }, none )
 
-                -- TODO: Handle
                 _ ->
                     ( model, none )
 

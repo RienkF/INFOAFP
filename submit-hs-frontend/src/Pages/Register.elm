@@ -77,8 +77,7 @@ update msg model =
                     , pushUrl model.navKey "/login"
                     )
 
-                -- TODO: Handle
-                Err _ ->
+                _ ->
                     ( model, Cmd.none )
 
         UsersMsg _ ->

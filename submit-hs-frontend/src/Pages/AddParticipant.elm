@@ -101,8 +101,7 @@ update msg model =
                     , Cmd.none
                     )
 
-                -- TODO: Handle
-                Err _ ->
+                _ ->
                     ( model, Cmd.none )
 
         UsersMsg (ClassroomUsersDataReceived result) ->
@@ -112,8 +111,7 @@ update msg model =
                     , Cmd.none
                     )
 
-                -- TODO: Handle
-                Err _ ->
+                _ ->
                     ( model, Cmd.none )
 
         UsersMsg _ ->
@@ -135,8 +133,7 @@ update msg model =
                 Ok _ ->
                     ( model, pushUrl model.navKey <| "/users/" ++ fromInt model.userId ++ "/classrooms/" ++ fromInt model.classroomId )
 
-                -- TODO: Handle
-                Err _ ->
+                _ ->
                     ( model, Cmd.none )
 
         ClassroomsMsg _ ->

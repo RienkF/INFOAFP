@@ -1,8 +1,8 @@
 module Pages.Login exposing (..)
 
-import ApiClient.Users exposing (Msg(..), Users, getUsers)
+import ApiClient.Users exposing (Msg(..), Users, deleteUser, getUsers)
 import Browser exposing (Document)
-import Browser.Navigation exposing (Key, pushUrl)
+import Browser.Navigation exposing (Key, pushUrl, reload)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
@@ -10,8 +10,6 @@ import List exposing (append)
 import Platform.Cmd exposing (none)
 import String exposing (fromInt, toInt)
 import Util exposing (isNothing)
-import ApiClient.Users exposing (deleteUser)
-import Browser.Navigation exposing (reload)
 
 
 
@@ -96,7 +94,6 @@ update msg model =
                     , Cmd.none
                     )
 
-                -- TODO: Handle
                 Err _ ->
                     ( model, Cmd.none )
 
@@ -119,11 +116,19 @@ update msg model =
 
         Delete ->
             case model.selectedUserId of
-                Just id -> ( model, Cmd.map DeleteResult (deleteUser id))
-                _ -> ( model, Cmd.none )
+                Just id ->
+                    ( model, Cmd.map DeleteResult (deleteUser id) )
+
+                _ ->
+                    ( model, Cmd.none )
+
         DeleteResult (UserDeleted result) ->
             case result of
-                Ok () -> ( model, reload )
-                _ -> ( model, Cmd.none )
+                Ok () ->
+                    ( model, reload )
+
+                _ ->
+                    ( model, Cmd.none )
+
         DeleteResult _ ->
-                ( model, Cmd.none )
+            ( model, Cmd.none )

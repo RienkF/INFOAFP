@@ -1,18 +1,12 @@
 module Pages.Attempt exposing (..)
 
-import ApiClient.Assignments
-import ApiClient.Attempts exposing (Attempt, getAttempt)
+import ApiClient.Attempts exposing (Attempt, Msg(..), deleteAttempt, getAttempt)
 import Browser exposing (Document)
-import Browser.Navigation exposing (Key, pushUrl)
-import Html exposing (a, button, div, h1, h2, li, p, text, ul)
-import Html.Attributes exposing (href)
+import Browser.Navigation exposing (Key, back)
+import Html exposing (button, div, h1, p, text)
 import Html.Events exposing (onClick)
-import List exposing (map)
 import String exposing (fromInt)
 import Util exposing (loadingIfNothing)
-import ApiClient.Attempts exposing (deleteAttempt)
-import ApiClient.Attempts exposing (Msg(..))
-import Browser.Navigation exposing (back)
 
 
 
@@ -48,11 +42,12 @@ view { attemptId, attemptData } =
             [ h1 [] [ text ("Attempt: " ++ fromInt attemptId) ]
             , loadingIfNothing attemptData
                 (\attempt ->
-                    div [] [ p [] [ text attempt.file ]
-                           , button
-                             [ onClick DeleteMsg ]
-                             [ text "Delete Attempt" ] 
-                           ]
+                    div []
+                        [ p [] [ text attempt.file ]
+                        , button
+                            [ onClick DeleteMsg ]
+                            [ text "Delete Attempt" ]
+                        ]
                 )
             ]
         ]
@@ -73,13 +68,15 @@ update msg model =
                     , Cmd.none
                     )
 
-                -- TODO: Handle
                 _ ->
                     ( model, Cmd.none )
+
         AttemptsMsg _ ->
             ( model, Cmd.none )
+
         DeleteMsg ->
             ( model, Cmd.map DeleteResultMsg (deleteAttempt model.attemptId) )
+
         DeleteResultMsg (AttemptDeleted result) ->
             case result of
                 Ok _ ->
@@ -87,12 +84,11 @@ update msg model =
                     , back model.navKey 1
                     )
 
-                -- TODO: Handle
                 Err _ ->
                     ( model, Cmd.none )
+
         DeleteResultMsg _ ->
             ( model, Cmd.none )
-
 
 
 type Msg
